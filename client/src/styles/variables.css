@@ -1,94 +1,32 @@
 /* ============================================
-   DAVRA v2.0 — Strict Color & Design System Tokens
+   DAVRA v2.0 — CSS Variables (Stage 1)
    ============================================ */
 
 :root {
-  /* ─── Strict Allowed Color Tokens ─── */
   --color-bg: #123ccf;
   --color-bg-elevated: #1a4ae0;
   --color-accent: #b7ff00;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #d0dcff;
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.7);
   --color-border: rgba(255, 255, 255, 0.15);
 
-  /* Core Palette Aliases */
-  --primary: #123ccf;
-  --primary-light: #1a4ae0;
-  --primary-dark: #0f32ab;
-  --accent: #b7ff00;
-  --accent-hover: #c7ff33;
-
-  /* Surfaces & Glass */
-  --background: var(--color-bg);
-  --surface: var(--color-bg-elevated);
-  --surface-hover: rgba(255, 255, 255, 0.14);
-  --surface-card: rgba(255, 255, 255, 0.08);
-
-  /* Typography Colors (No Black / No Gray) */
-  --text: var(--color-text-primary);
-  --text-secondary: var(--color-text-secondary);
-  --text-accent: var(--color-accent);
-  --muted: rgba(255, 255, 255, 0.7);
-  --border: var(--color-border);
-
-  /* Semantic Alerts */
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
-
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-  --glass-blur: blur(24px);
-
-  /* Glow Effects */
-  --glow-accent: 0 0 25px rgba(183, 255, 0, 0.4), 0 0 50px rgba(183, 255, 0, 0.18);
-  --glow-accent-strong: 0 0 40px rgba(183, 255, 0, 0.65), 0 0 80px rgba(183, 255, 0, 0.3);
-
-  /* Typography Scale */
-  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 30px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-  --text-hero: clamp(32px, 7vw, 64px);
-
-  --weight-normal: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
-  --weight-extrabold: 800;
-  --weight-black: 900;
-
-  /* Strict Spacing Scale (No Arbitrary Numbers) */
   --space-xs: 8px;
   --space-sm: 16px;
   --space-md: 24px;
   --space-lg: 40px;
   --space-xl: 64px;
+  --header-height: 72px;
 
-  /* Radius Scale */
-  --radius-xs: 4px;
+  /* Aliases */
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-muted);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --radius-2xl: 28px;
   --radius-full: 9999px;
 
-  /* Motion & Easing */
-  --apple-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Layout Container Constraints */
-  --container-max: 1200px;
+  --glow-accent: 0 0 25px rgba(183, 255, 0, 0.4);
 }

@@ -3,19 +3,21 @@
    ============================================ */
 
 .profile-page {
-  padding-top: var(--space-8);
-  padding-bottom: var(--space-16);
-  max-width: var(--container-max);
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-xl);
 }
 
 .profile-hero-card {
-  padding: var(--space-8);
+  padding: var(--space-lg);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
 }
 
 .profile-hero-top {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-8);
+  gap: var(--space-lg);
   position: relative;
   flex-wrap: wrap;
 }
@@ -28,7 +30,7 @@
 .profile-avatar {
   width: 110px;
   height: 110px;
-  border-radius: var(--radius-full);
+  border-radius: 9999px;
   border: 3px solid var(--color-accent);
   object-fit: cover;
   box-shadow: var(--glow-accent);
@@ -40,15 +42,14 @@
   right: 0;
   width: 34px;
   height: 34px;
-  background: var(--color-accent);
-  color: #0A0A0A;
-  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  color: #123ccf;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
-  font-size: var(--text-sm);
+  font-size: 14px;
   transition: transform var(--transition-fast);
 }
 
@@ -62,28 +63,31 @@
 }
 
 .profile-hero-details h1 {
-  font-size: var(--text-3xl);
-  color: #ffffff;
+  font-size: 28px;
+  color: var(--color-text);
+  font-weight: 800;
 }
 
 .profile-bio-text {
-  font-size: var(--text-base);
-  color: rgba(255, 255, 255, 0.85);
-  margin-top: var(--space-2);
+  font-size: 15px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
 }
 
 .profile-meta-chips {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-xs);
   flex-wrap: wrap;
+  margin-top: var(--space-xs);
 }
 
 .meta-chip {
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.08);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
 }
 
 .btn-edit-profile {
@@ -92,7 +96,10 @@
 
 .profile-stats-row {
   display: flex;
-  gap: var(--space-12);
+  gap: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
 }
 
 .profile-stat-item {
@@ -101,21 +108,24 @@
 }
 
 .stat-num {
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-extrabold);
+  font-size: 28px;
+  font-weight: 800;
   color: var(--color-accent);
   line-height: 1;
 }
 
 .stat-lbl {
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  color: var(--color-text-muted);
   margin-top: 2px;
 }
 
 /* Edit Form */
 .profile-edit-form {
   padding: var(--space-lg);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
 }
 
 .form-grid {
@@ -132,16 +142,17 @@
 .profile-details-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: var(--space-8);
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
 }
 
 /* Timeline */
 .timeline-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-sm);
   position: relative;
-  padding-left: var(--space-4);
+  padding-left: var(--space-sm);
   border-left: 2px solid rgba(183, 255, 0, 0.3);
 }
 
@@ -151,11 +162,11 @@
 
 .timeline-dot {
   position: absolute;
-  left: calc(-1 * var(--space-4) - 5px);
+  left: calc(-1 * var(--space-sm) - 5px);
   top: 4px;
   width: 8px;
   height: 8px;
-  background: var(--color-accent);
+  background-color: var(--color-accent);
   border-radius: 50%;
   box-shadow: var(--glow-accent);
 }
@@ -168,13 +179,13 @@
 }
 
 .timeline-time {
-  font-size: var(--text-xs);
-  color: var(--muted);
+  font-size: 12px;
+  color: var(--color-text-muted);
 }
 
 .timeline-msg {
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -190,6 +201,6 @@
   }
   .btn-edit-profile {
     width: 100%;
-    margin-top: var(--space-4);
+    margin-top: var(--space-sm);
   }
 }

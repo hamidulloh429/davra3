@@ -7,22 +7,9 @@ import './Navbar.css';
 
 export default function Navbar() {
   const { user, profile, loginWithGoogle, logout } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [siteLogo, setSiteLogo] = useState(null);
-
-  useEffect(() => {
-    function handleScroll() {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    }
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     async function fetchSiteLogo() {
@@ -39,38 +26,38 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={`navbar-header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="navbar-container container">
+    <header className="header">
+      <div className="header-inner">
         {/* Brand Logo */}
         <Link to="/" className="navbar-logo">
           {siteLogo ? (
             <img src={siteLogo} alt="Davra Logo" className="navbar-logo-img" style={{ maxHeight: '36px', objectFit: 'contain' }} />
           ) : (
-            <>
-              <span className="logo-text">DAVRA</span>
-              <span className="logo-dot" />
-            </>
+            <div className="flex items-center gap-1">
+              <span className="logo-text" style={{ color: '#ffffff', fontWeight: 900, fontSize: '24px', letterSpacing: '0.05em' }}>DAVRA</span>
+              <span className="logo-dot" style={{ width: '8px', height: '8px', backgroundColor: 'var(--color-accent)', borderRadius: '50%' }} />
+            </div>
           )}
         </Link>
 
-        {/* Center Nav Links (Desktop) */}
-        <nav className="navbar-links desktop-only">
-          <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+        {/* Navigation Links */}
+        <nav className={`header-nav ${mobileDrawerOpen ? 'open' : ''}`}>
+          <NavLink to="/" end onClick={() => setMobileDrawerOpen(false)}>
             Bosh sahifa
           </NavLink>
-          <NavLink to="/communities" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          <NavLink to="/communities" onClick={() => setMobileDrawerOpen(false)}>
             Davralar
           </NavLink>
         </nav>
 
         {/* Right Actions */}
-        <div className="navbar-actions">
+        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {user ? (
             <>
               <NotificationBell />
 
-              {/* User Avatar Dropdown */}
-              <div className="user-dropdown-wrapper">
+              {/* User Dropdown */}
+              <div className="user-dropdown-wrapper" style={{ position: 'relative' }}>
                 <button
                   className="avatar-btn"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -80,31 +67,32 @@ export default function Navbar() {
                     src={getAvatarUrl(profile?.avatar_url, profile?.full_name || user.email)}
                     alt="Avatar"
                     className="avatar avatar-sm"
+                    style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--color-accent)' }}
                   />
                 </button>
 
                 {dropdownOpen && (
-                  <div className="user-dropdown-menu card animate-scale-in">
-                    <div className="dropdown-user-header">
-                      <span className="user-name">{profile?.full_name || 'Foydalanuvchi'}</span>
-                      <span className="user-username">@{profile?.username || 'username'}</span>
+                  <div className="user-dropdown-menu card animate-scale-in" style={{ position: 'absolute', top: '100%', right: 0, width: '220px', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '12px', zIndex: 200, marginTop: '8px' }}>
+                    <div className="dropdown-user-header mb-2">
+                      <span className="user-name font-bold block" style={{ color: '#ffffff' }}>{profile?.full_name || 'Foydalanuvchi'}</span>
+                      <span className="user-username text-xs" style={{ color: 'var(--color-accent)' }}>@{profile?.username || 'username'}</span>
                     </div>
 
-                    <hr className="divider" style={{ marginBlock: '8px' }} />
+                    <div style={{ borderTop: '1px solid var(--color-border)', marginBlock: '8px' }} />
 
-                    <Link to="/profile" className="dropdown-link" onClick={() => setDropdownOpen(false)}>
+                    <Link to="/profile" className="dropdown-link" style={{ display: 'block', padding: '6px 8px', color: '#ffffff' }} onClick={() => setDropdownOpen(false)}>
                       👤 Profilim
                     </Link>
-                    <Link to="/settings" className="dropdown-link" onClick={() => setDropdownOpen(false)}>
+                    <Link to="/settings" className="dropdown-link" style={{ display: 'block', padding: '6px 8px', color: '#ffffff' }} onClick={() => setDropdownOpen(false)}>
                       ⚙️ Sozlamalar
                     </Link>
-                    <Link to="/admin/login" className="dropdown-link" onClick={() => setDropdownOpen(false)}>
+                    <Link to="/admin/login" className="dropdown-link" style={{ display: 'block', padding: '6px 8px', color: '#ffffff' }} onClick={() => setDropdownOpen(false)}>
                       🔒 Admin Panel
                     </Link>
 
-                    <hr className="divider" style={{ marginBlock: '8px' }} />
+                    <div style={{ borderTop: '1px solid var(--color-border)', marginBlock: '8px' }} />
 
-                    <button className="dropdown-link text-error w-full text-left" onClick={logout}>
+                    <button className="dropdown-link text-error w-full text-left" style={{ display: 'block', padding: '6px 8px', color: '#EF4444' }} onClick={logout}>
                       🚪 Tizimdan chiqish
                     </button>
                   </div>
@@ -123,40 +111,15 @@ export default function Navbar() {
             </button>
           )}
 
-          {/* Mobile Hamburger Toggle */}
+          {/* Mobile Toggle */}
           <button
-            className="hamburger-btn mobile-only"
+            className="mobile-menu-toggle"
             onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
           >
             ☰
           </button>
         </div>
       </div>
-
-      {/* Mobile Slide Drawer */}
-      {mobileDrawerOpen && (
-        <div className="mobile-drawer animate-slide-down">
-          <NavLink to="/" end className="mobile-drawer-link" onClick={() => setMobileDrawerOpen(false)}>
-            Bosh sahifa
-          </NavLink>
-          <NavLink to="/communities" className="mobile-drawer-link" onClick={() => setMobileDrawerOpen(false)}>
-            Davralar
-          </NavLink>
-          {user && (
-            <>
-              <NavLink to="/profile" className="mobile-drawer-link" onClick={() => setMobileDrawerOpen(false)}>
-                Profilim
-              </NavLink>
-              <NavLink to="/settings" className="mobile-drawer-link" onClick={() => setMobileDrawerOpen(false)}>
-                Sozlamalar
-              </NavLink>
-              <button className="mobile-drawer-link text-error text-left w-full" onClick={logout}>
-                Chiqish
-              </button>
-            </>
-          )}
-        </div>
-      )}
     </header>
   );
 }
