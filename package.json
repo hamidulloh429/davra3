@@ -4,8 +4,9 @@
   "description": "Davra — Professional community platform for networking and collaboration",
   "private": true,
   "scripts": {
+    "postinstall": "cd client && npm install",
     "dev": "cd client && npm run dev",
-    "build": "cd client && npm run build",
+    "build": "cd client && npm install && npm run build",
     "preview": "cd client && npm run preview",
     "lint": "cd client && npm run lint",
     "install:all": "cd client && npm install"
