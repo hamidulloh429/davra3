@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, getAvatarUrl } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { formatDate } from '../lib/utils';
+import { formatDate, timeAgo } from '../lib/utils';
 import CircleCard from '../components/CircleCard';
 import './ProfilePage.css';
 
@@ -21,6 +21,8 @@ export default function ProfilePage() {
   });
   const [interestInput, setInterestInput] = useState('');
   const [myCircles, setMyCircles] = useState([]);
+  const [userMessages, setUserMessages] = useState([]);
+  const [stats, setStats] = useState({ total_messages: 0, total_circles: 0 });
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -38,22 +40,38 @@ export default function ProfilePage() {
   }, [profile]);
 
   useEffect(() => {
-    async function fetchUserCircles() {
+    async function fetchUserData() {
       if (!user) return;
       try {
-        const { data } = await supabase
+        // Fetch user's circles
+        const { data: circleData } = await supabase
           .from('circle_members')
           .select('*, circles(*, categories(name))')
           .eq('user_id', user.id);
 
-        if (data) {
-          setMyCircles(data.map(m => m.circles).filter(Boolean));
+        if (circleData) {
+          const circles = circleData.map(m => m.circles).filter(Boolean);
+          setMyCircles(circles);
+          setStats(prev => ({ ...prev, total_circles: circles.length }));
+        }
+
+        // Fetch user's recent messages for activity timeline
+        const { data: msgData, count: msgCount } = await supabase
+          .from('messages')
+          .select('*, circles(name, slug)', { count: 'exact' })
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (msgData) {
+          setUserMessages(msgData);
+          setStats(prev => ({ ...prev, total_messages: msgCount || msgData.length }));
         }
       } catch (err) {
-        console.error('Fetch circles error:', err);
+        console.error('Fetch user activity error:', err);
       }
     }
-    fetchUserCircles();
+    fetchUserData();
   }, [user]);
 
   const handleAvatarUpload = async (e) => {
@@ -158,37 +176,65 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="profile-page container">
-      {/* Cover Header Banner */}
-      <div className="profile-banner bg-grid-dark">
-        <div className="profile-avatar-wrapper">
-          <img
-            src={getAvatarUrl(profile.avatar_url, profile.full_name)}
-            alt={profile.full_name}
-            className="profile-avatar"
-          />
-          <label className="avatar-edit-badge" title="Rasm yuklash">
-            <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden disabled={uploadingAvatar} />
-            {uploadingAvatar ? '...' : '📷'}
-          </label>
+    <div className="profile-page container animate-fade-in">
+      {/* Personalized Profile Hero Card */}
+      <div className="profile-hero-card card-glass animate-slide-up">
+        <div className="profile-hero-top">
+          <div className="profile-avatar-wrapper">
+            <img
+              src={getAvatarUrl(profile.avatar_url, profile.full_name)}
+              alt={profile.full_name}
+              className="profile-avatar"
+            />
+            <label className="avatar-edit-badge" title="Rasm yuklash">
+              <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden disabled={uploadingAvatar} />
+              {uploadingAvatar ? '...' : '📷'}
+            </label>
+          </div>
+
+          <div className="profile-hero-details">
+            <div className="flex items-center gap-3">
+              <h1>{profile.full_name}</h1>
+              <span className="badge badge-accent">@{profile.username || 'username'}</span>
+            </div>
+            <p className="profile-bio-text">{profile.bio || "Foydalanuvchi qisqa bio kiritmagan."}</p>
+
+            <div className="profile-meta-chips mt-3">
+              {profile.location && <span className="meta-chip">📍 {profile.location}</span>}
+              {profile.website && (
+                <span className="meta-chip">
+                  🌐 <a href={profile.website} target="_blank" rel="noreferrer" className="text-accent">{profile.website}</a>
+                </span>
+              )}
+              <span className="meta-chip">📅 Qo'shilgan: {formatDate(profile.created_at)}</span>
+            </div>
+          </div>
+
+          <button className="btn btn-outline btn-edit-profile" onClick={() => setIsEditing(!isEditing)}>
+            {isEditing ? 'Bekor qilish' : '✏️ Profilni tahrirlash'}
+          </button>
+        </div>
+
+        {/* Stats Row */}
+        <div className="profile-stats-row mt-6 pt-6 border-t">
+          <div className="profile-stat-item">
+            <span className="stat-num">{stats.total_circles}</span>
+            <span className="stat-lbl">A'zo Davralar</span>
+          </div>
+          <div className="profile-stat-item">
+            <span className="stat-num">{stats.total_messages}</span>
+            <span className="stat-lbl">Xabarlar</span>
+          </div>
+          <div className="profile-stat-item">
+            <span className="stat-num">{profile.interests?.length || 0}</span>
+            <span className="stat-lbl">Qiziqishlar</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Info */}
-      <div className="profile-header-info">
-        <div className="profile-titles">
-          <h1>{profile.full_name}</h1>
-          <span className="profile-username">@{profile.username || 'username'}</span>
-        </div>
-
-        <button className="btn btn-outline" onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? 'Bekor qilish' : '✏️ Profilni tahrirlash'}
-        </button>
-      </div>
-
-      {/* Edit Form or View Details */}
+      {/* Edit Form */}
       {isEditing ? (
-        <form onSubmit={handleSave} className="profile-edit-form card">
+        <form onSubmit={handleSave} className="profile-edit-form card animate-scale-in mt-8">
           <h3>Profil ma'lumotlarini tahrirlash</h3>
 
           <div className="form-grid">
@@ -226,7 +272,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Joylashuv (Shahar / Mamlakat)</label>
+              <label className="input-label">Joylashuv</label>
               <input
                 type="text"
                 className="input"
@@ -248,7 +294,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="input-group full-width">
-              <label className="input-label">Qiziqishlar (Enter tugmasini bosing)</label>
+              <label className="input-label">Qiziqishlar (Enter bosing)</label>
               <input
                 type="text"
                 className="input"
@@ -276,43 +322,43 @@ export default function ProfilePage() {
           </div>
         </form>
       ) : (
-        <div className="profile-details-grid">
-          <div className="profile-bio-card card">
-            <h3>Haqida</h3>
-            <p>{profile.bio || "Foydalanuvchi bio kiritmagan."}</p>
-
-            <div className="profile-meta-list mt-4">
-              {profile.location && <span>📍 {profile.location}</span>}
-              {profile.website && (
-                <span>
-                  🌐 <a href={profile.website} target="_blank" rel="noreferrer">{profile.website}</a>
-                </span>
-              )}
-              <span>📅 Qo'shilgan: {formatDate(profile.created_at)}</span>
-            </div>
-
-            {profile.interests && profile.interests.length > 0 && (
-              <div className="mt-4">
-                <h4>Qiziqishlar</h4>
-                <div className="interests-tags mt-2">
-                  {profile.interests.map((tag, idx) => (
-                    <span key={idx} className="badge badge-accent">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
+        <div className="profile-details-grid mt-8">
+          {/* Joined Circles */}
           <div className="profile-circles-section">
-            <h3>A'zo bo'lingan davralar ({myCircles.length})</h3>
+            <h3 className="section-title text-xl mb-4">A'zo bo'lingan davralar ({myCircles.length})</h3>
             {myCircles.length > 0 ? (
-              <div className="profile-circles-grid mt-4">
+              <div className="profile-circles-grid">
                 {myCircles.map(c => (
                   <CircleCard key={c.id} circle={c} />
                 ))}
               </div>
             ) : (
-              <p className="text-muted mt-2">Hali hech qaysi davraga qo'shilmadingiz.</p>
+              <div className="card text-center py-8">
+                <p className="text-muted">Hali hech qaysi davraga qo'shilmadingiz.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Activity Timeline Card */}
+          <div className="profile-timeline-card card">
+            <h3 className="text-xl mb-4">Faoliyat Tarixi (Activity)</h3>
+            {userMessages.length > 0 ? (
+              <div className="timeline-list">
+                {userMessages.map((msg) => (
+                  <div key={msg.id} className="timeline-item">
+                    <div className="timeline-dot" />
+                    <div className="timeline-content">
+                      <div className="timeline-header">
+                        <span className="badge badge-primary">{msg.circles?.name || 'Davra'}</span>
+                        <span className="timeline-time">{timeAgo(msg.created_at)}</span>
+                      </div>
+                      <p className="timeline-msg">"{msg.content}"</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted text-sm">Suhbatlardagi faoliyatingiz shu yerda ko'rinadi.</p>
             )}
           </div>
         </div>
