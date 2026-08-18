@@ -5,9 +5,9 @@
 *,
 *::before,
 *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
@@ -47,6 +47,32 @@ a {
 
 a:hover {
   color: #ffffff;
+}
+
+/* ─── Typography Spacing ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+h1 { font-size: var(--text-5xl); }
+h2 { font-size: var(--text-4xl); }
+h3 { font-size: var(--text-2xl); }
+h4 { font-size: var(--text-xl); }
+h5 { font-size: var(--text-lg); }
+h6 { font-size: var(--text-base); }
+
+p {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-sm);
+}
+
+p:last-child {
+  margin-bottom: 0;
 }
 
 /* ─── Apple Motion Button ─── */
@@ -124,26 +150,6 @@ select option {
   background: var(--color-accent);
 }
 
-/* ─── Typography ─── */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: var(--weight-bold);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--color-text-primary);
-}
-
-h1 { font-size: var(--text-5xl); }
-h2 { font-size: var(--text-4xl); }
-h3 { font-size: var(--text-2xl); }
-h4 { font-size: var(--text-xl); }
-h5 { font-size: var(--text-lg); }
-h6 { font-size: var(--text-base); }
-
-p {
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-}
-
 /* ─── MANDATORY PAGE CONTAINER ─── */
 .page-container,
 .container {
@@ -156,10 +162,12 @@ p {
 /* ─── SECTION SPACING SCALE ─── */
 .section {
   padding-block: var(--space-xl);
+  margin-bottom: var(--space-lg);
 }
 
 .section-sm {
   padding-block: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 /* ─── BUTTONS ─── */
@@ -264,8 +272,9 @@ p {
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-md) !important;
   align-items: stretch;
+  margin-bottom: var(--space-lg);
 }
 
 .card {

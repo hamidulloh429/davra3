@@ -3,22 +3,23 @@
    ============================================ */
 
 .admin-dashboard {
-  animation: fadeIn 350ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: pageEnter 350ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .admin-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .admin-stat-card {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
   backdrop-filter: blur(20px);
   border-radius: var(--radius-xl);
   transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
@@ -40,7 +41,7 @@
   font-size: 1.6rem;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-border);
 }
 
 .stat-value {
@@ -53,21 +54,22 @@
 
 .stat-label {
   font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-text-secondary);
   font-weight: var(--weight-medium);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .dashboard-actions-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .action-card {
-  padding: var(--space-6);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: var(--space-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
@@ -81,18 +83,18 @@
 .action-icon {
   font-size: 2.4rem;
   display: block;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-xs);
 }
 
 .action-card h4 {
   font-size: var(--text-lg);
-  margin-bottom: var(--space-1);
+  margin-bottom: 4px;
   color: #ffffff;
 }
 
 .action-card p {
   font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-secondary);
 }
 
 /* Admin Tables */
@@ -109,23 +111,22 @@
 
 .admin-table th,
 .admin-table td {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
   font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
 }
 
 .admin-table th {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--color-accent);
   font-weight: var(--weight-semibold);
   font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: var(--tracking-wider);
 }
 
 .admin-table tr:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 1024px) {
