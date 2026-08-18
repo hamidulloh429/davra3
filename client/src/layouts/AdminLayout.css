@@ -1,7 +1,13 @@
+/* ============================================
+   DAVRA v2.0 — Admin Layout Styles
+   Strict #123ccf background & #b7ff00 accents
+   ============================================ */
+
 .admin-layout {
   display: flex;
   min-height: 100dvh;
-  background: var(--surface);
+  background: var(--color-bg);
+  color: #ffffff;
 }
 
 .admin-loading-screen {
@@ -11,14 +17,17 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  background: var(--background);
+  background: var(--color-bg);
+  color: #ffffff;
 }
 
 /* Sidebar */
 .admin-sidebar {
   width: 260px;
-  background: #041B6B;
-  color: var(--text-inverse);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -34,14 +43,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .brand-title {
   font-size: var(--text-xl);
   font-weight: var(--weight-black);
   letter-spacing: var(--tracking-wider);
-  color: var(--text-inverse);
+  color: var(--color-accent);
 }
 
 .sidebar-nav {
@@ -58,28 +67,28 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  color: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-lg);
+  color: rgba(255, 255, 255, 0.75);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   transition: all var(--transition-fast);
 }
 
 .sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-inverse);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .sidebar-link.active {
-  background: var(--primary);
-  color: var(--text-inverse);
-  font-weight: var(--weight-semibold);
-  border-left: 3px solid var(--accent);
+  background: var(--color-accent);
+  color: #0A0A0A;
+  font-weight: var(--weight-bold);
+  box-shadow: var(--glow-accent);
 }
 
 .sidebar-footer {
   padding: var(--space-4);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Main Area */
@@ -92,9 +101,10 @@
 }
 
 .admin-header {
-  height: 64px;
-  background: var(--background);
-  border-bottom: 1px solid var(--border);
+  height: 68px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   padding-inline: var(--space-6);
   display: flex;
   align-items: center;
@@ -107,6 +117,7 @@
 .mobile-toggle-btn {
   display: none;
   font-size: var(--text-xl);
+  color: #ffffff;
 }
 
 .admin-header-user {
@@ -119,6 +130,7 @@
 .admin-name {
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
+  color: #ffffff;
 }
 
 .admin-content {
@@ -147,7 +159,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     z-index: calc(var(--z-sticky) - 1);
   }
 }
