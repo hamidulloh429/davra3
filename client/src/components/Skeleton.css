@@ -1,0 +1,51 @@
+.shimmer {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 800px 100%; 
+  animation: shimmer 1.5s infinite linear forwards;
+}
+
+.skeleton-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  height: 250px;
+}
+
+.skeleton-cover {
+  height: 120px;
+  width: 100%;
+}
+
+.skeleton-content {
+  padding: var(--space-4);
+}
+
+.skeleton-line {
+  height: 12px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.skeleton-line.title {
+  height: 20px;
+  width: 70%;
+  margin-bottom: var(--space-4);
+}
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-avatar {
+  border-radius: 50%;
+}
+
+.skeleton-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

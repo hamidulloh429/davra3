@@ -1,0 +1,58 @@
+.circle-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.circle-cover {
+  height: 140px;
+  width: 100%;
+  position: relative;
+  padding: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.circle-body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.circle-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-2);
+  color: var(--text);
+}
+
+.circle-desc {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  line-height: var(--leading-snug);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+  flex: 1;
+}
+
+.circle-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+
+.badge-glass {
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}

@@ -1,0 +1,23 @@
+.admin-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.user-detail-modal p {
+  margin-bottom: var(--space-2);
+}
+
+.user-detail-modal p:last-child {
+  margin-bottom: 0;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "davra",
+  "version": "2.0.0",
+  "description": "Davra — Professional community platform for networking and collaboration",
+  "private": true,
+  "scripts": {
+    "dev": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview",
+    "lint": "cd client && npm run lint",
+    "install:all": "cd client && npm install"
+  }
+}

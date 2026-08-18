@@ -1,0 +1,35 @@
+{
+  "name": "davra-server",
+  "version": "1.0.0",
+  "description": "Davra backend API server",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "migrate": "node db/migrate.js",
+    "seed:admin": "node db/seed.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^10.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "embedded-postgres": "^17.10.0-beta.17",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.2.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.13.0",
+    "sharp": "^0.35.3",
+    "socket.io": "^4.8.3",
+    "uuid": "^10.0.0"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true,
+    "@embedded-postgres/windows-x64@17.10.0-beta.17": true
+  }
+}

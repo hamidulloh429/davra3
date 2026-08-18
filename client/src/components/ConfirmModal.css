@@ -1,0 +1,20 @@
+.confirm-modal-body {
+  padding-block: var(--space-4);
+}
+
+.confirm-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.confirm-message {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

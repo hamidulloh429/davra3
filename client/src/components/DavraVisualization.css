@@ -1,0 +1,47 @@
+.davra-viz {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.davra-center {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-navy);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-cream);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  z-index: 10;
+  animation: pulse 3s infinite ease-in-out;
+  box-shadow: 0 0 20px rgba(15, 31, 51, 0.3);
+}
+
+.davra-orbit-el {
+  position: absolute;
+  border-radius: 50%;
+  animation: orbit linear infinite;
+  z-index: 5;
+  box-shadow: var(--shadow-sm);
+}
+
+.davra-ring {
+  position: absolute;
+  border: 1px dashed rgba(31, 58, 95, 0.15);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .davra-viz {
+    width: 300px;
+    height: 300px;
+    transform: scale(0.7);
+  }
+}

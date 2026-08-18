@@ -1,0 +1,81 @@
+.settings-page {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-16);
+  max-width: var(--container-lg);
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: var(--space-8);
+}
+
+.settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tab-btn {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
+  transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+.tab-btn.danger.active {
+  background: var(--error);
+}
+
+.settings-content {
+  padding: var(--space-8);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.toggle-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  display: block;
+}
+
+.toggle-desc {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Davra",
+  "short_name": "Davra",
+  "description": "Professional Community Platform — Qiziqishlaringizga mos davralarni toping",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#123CCF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "community"]
+}
