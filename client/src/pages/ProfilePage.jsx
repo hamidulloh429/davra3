@@ -3,6 +3,7 @@ import { supabase, getAvatarUrl } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, timeAgo } from '../lib/utils';
+import useScrollReveal from '../hooks/useScrollReveal';
 import CircleCard from '../components/CircleCard';
 import './ProfilePage.css';
 
@@ -26,6 +27,8 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  useScrollReveal('.scroll-reveal');
+
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -43,7 +46,6 @@ export default function ProfilePage() {
     async function fetchUserData() {
       if (!user) return;
       try {
-        // Fetch user's circles
         const { data: circleData } = await supabase
           .from('circle_members')
           .select('*, circles(*, categories(name))')
@@ -55,7 +57,6 @@ export default function ProfilePage() {
           setStats(prev => ({ ...prev, total_circles: circles.length }));
         }
 
-        // Fetch user's recent messages for activity timeline
         const { data: msgData, count: msgCount } = await supabase
           .from('messages')
           .select('*, circles(name, slug)', { count: 'exact' })
@@ -169,16 +170,16 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="container section text-center">
+      <div className="container section text-center page-enter">
         <h2>Profil yuklanmoqda...</h2>
       </div>
     );
   }
 
   return (
-    <div className="profile-page container animate-fade-in">
-      {/* Personalized Profile Hero Card */}
-      <div className="profile-hero-card card-glass animate-slide-up">
+    <div className="profile-page container page-enter">
+      {/* Personalized Hero Card */}
+      <div className="profile-hero-card card-glass">
         <div className="profile-hero-top">
           <div className="profile-avatar-wrapper">
             <img
@@ -322,14 +323,15 @@ export default function ProfilePage() {
           </div>
         </form>
       ) : (
-        <div className="profile-details-grid mt-8">
-          {/* Joined Circles */}
+        <div className="profile-details-grid mt-8 scroll-reveal">
           <div className="profile-circles-section">
             <h3 className="section-title text-xl mb-4">A'zo bo'lingan davralar ({myCircles.length})</h3>
             {myCircles.length > 0 ? (
-              <div className="profile-circles-grid">
-                {myCircles.map(c => (
-                  <CircleCard key={c.id} circle={c} />
+              <div className="card-grid">
+                {myCircles.map((c, idx) => (
+                  <div key={c.id} className="stagger-item" style={{ animationDelay: `${(idx + 1) * 70}ms` }}>
+                    <CircleCard circle={c} />
+                  </div>
                 ))}
               </div>
             ) : (
@@ -339,13 +341,12 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Activity Timeline Card */}
           <div className="profile-timeline-card card">
             <h3 className="text-xl mb-4">Faoliyat Tarixi (Activity)</h3>
             {userMessages.length > 0 ? (
               <div className="timeline-list">
-                {userMessages.map((msg) => (
-                  <div key={msg.id} className="timeline-item">
+                {userMessages.map((msg, idx) => (
+                  <div key={msg.id} className="timeline-item stagger-item" style={{ animationDelay: `${(idx + 1) * 80}ms` }}>
                     <div className="timeline-dot" />
                     <div className="timeline-content">
                       <div className="timeline-header">

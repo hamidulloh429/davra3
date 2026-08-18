@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { timeAgo } from '../lib/utils';
+import useScrollReveal from '../hooks/useScrollReveal';
 import Hero3DElements from '../components/Hero3DElements';
 import CircleCard from '../components/CircleCard';
 import './HomePage.css';
@@ -18,6 +19,8 @@ export default function HomePage() {
   const [featuredCircles, setFeaturedCircles] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useScrollReveal('.scroll-reveal');
 
   useEffect(() => {
     async function loadData() {
@@ -71,11 +74,11 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="home-page animate-fade-in">
-      {/* ─── HERO SECTION ─── */}
+    <div className="home-page page-enter">
+      {/* HERO SECTION */}
       <section className="hero-section bg-grid-dark">
         <div className="hero-container container">
-          <div className="hero-content animate-slide-up">
+          <div className="hero-content">
             <div className="hero-badge badge badge-accent">
               <span className="badge-icon">⚡</span>
               <span>Professional Community Platform</span>
@@ -126,11 +129,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── LIVE STATS BAR ─── */}
-      <section className="stats-section">
+      {/* LIVE STATS BAR */}
+      <section className="stats-section scroll-reveal">
         <div className="container">
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card stagger-item">
               <span className="stat-icon">🌐</span>
               <div className="stat-info">
                 <h3>{stats.total_circles || 14}</h3>
@@ -138,7 +141,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="stat-card">
+            <div className="stat-card stagger-item">
               <span className="stat-icon">👥</span>
               <div className="stat-info">
                 <h3>{stats.total_users || 182}</h3>
@@ -146,7 +149,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="stat-card">
+            <div className="stat-card stagger-item">
               <span className="stat-icon">💬</span>
               <div className="stat-info">
                 <h3>{stats.today_messages || 450}</h3>
@@ -154,7 +157,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="stat-card">
+            <div className="stat-card stagger-item">
               <span className="stat-icon">⚡</span>
               <div className="stat-info">
                 <h3>{stats.active_users || 58}</h3>
@@ -165,8 +168,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── FEATURED CIRCLES ─── */}
-      <section className="section circles-section container">
+      {/* FEATURED CIRCLES */}
+      <section className="section circles-section container scroll-reveal">
         <div className="section-header">
           <div>
             <h2 className="section-title">Mashhur davralar</h2>
@@ -181,9 +184,11 @@ export default function HomePage() {
         </div>
 
         {featuredCircles.length > 0 ? (
-          <div className="circles-grid">
-            {featuredCircles.map(circle => (
-              <CircleCard key={circle.id} circle={circle} />
+          <div className="card-grid">
+            {featuredCircles.map((circle, index) => (
+              <div key={circle.id} className="stagger-item" style={{ animationDelay: `${(index + 1) * 70}ms` }}>
+                <CircleCard circle={circle} />
+              </div>
             ))}
           </div>
         ) : (
@@ -197,8 +202,8 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ─── LIVE ACTIVITY FEED PREVIEW ─── */}
-      <section className="section activity-feed-section container">
+      {/* LIVE ACTIVITY FEED */}
+      <section className="section activity-feed-section container scroll-reveal">
         <div className="section-header">
           <div>
             <h2 className="section-title">Jonli Hamjamiyat Faoliyati</h2>
@@ -209,8 +214,8 @@ export default function HomePage() {
 
         <div className="activity-feed-grid">
           {recentActivity.length > 0 ? (
-            recentActivity.map((msg) => (
-              <div key={msg.id} className="activity-card card">
+            recentActivity.map((msg, index) => (
+              <div key={msg.id} className="activity-card card stagger-item" style={{ animationDelay: `${(index + 1) * 80}ms` }}>
                 <div className="activity-card-header">
                   <span className="badge badge-primary">{msg.circles?.name || 'Davra'}</span>
                   <span className="activity-time">{timeAgo(msg.created_at)}</span>
@@ -230,8 +235,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── PLATFORM FEATURES ─── */}
-      <section className="section features-section">
+      {/* PLATFORM FEATURES */}
+      <section className="section features-section scroll-reveal">
         <div className="container">
           <div className="text-center mb-6">
             <h2 className="section-title">Nima uchun Davra?</h2>
@@ -240,48 +245,48 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="features-grid">
-            <div className="feature-card card">
+          <div className="card-grid">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '60ms' }}>
               <span className="feature-icon">💬</span>
               <h3>Real-time Chat & Media</h3>
-              <p>Text, yuqori sifatli rasm va videolarni zudlik bilan almashing. Sahifani yangilash talab etilmaydi.</p>
+              <p>Text, yuqori sifatli rasm va videolarni zudlik bilan almashing.</p>
             </div>
 
-            <div className="feature-card card">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '120ms' }}>
               <span className="feature-icon">🔐</span>
               <h3>Professional Xavfsizlik</h3>
-              <p>Google OAuth autentifikatsiyasi, qat'iy Row Level Security (RLS) va 2-Faktorli admin paneli.</p>
+              <p>Google OAuth autentifikatsiyasi va 2-Faktorli admin paneli.</p>
             </div>
 
-            <div className="feature-card card">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '180ms' }}>
               <span className="feature-icon">🏷️</span>
               <h3>Noyob Davralar</h3>
-              <p>Ochiq (Public), Yopiq (Private) yoki Faqat taklifli (Invite only) davralar yaratish erkinligi.</p>
+              <p>Ochiq, Yopiq yoki Faqat taklifli davralar yaratish erkinligi.</p>
             </div>
 
-            <div className="feature-card card">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '240ms' }}>
               <span className="feature-icon">📱</span>
               <h3>100% Mobile & PWA</h3>
-              <p>Barcha smartfon, planshet va kompyuterlarda birdek qulay. Ilova sifatida o'rnatish imkoniyati.</p>
+              <p>Barcha smartfon va planshetlarda birdek qulay ilova tajribasi.</p>
             </div>
 
-            <div className="feature-card card">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '300ms' }}>
               <span className="feature-icon">⚡</span>
               <h3>3D & Fast UI</h3>
-              <p>Yengil 3D interaktiv animatsiyalar, yuqori tezlik va modern Web3 startup estetikasi.</p>
+              <p>Yengil 3D interaktiv animatsiyalar va Web3 startup estetikasi.</p>
             </div>
 
-            <div className="feature-card card">
+            <div className="feature-card card stagger-item" style={{ animationDelay: '360ms' }}>
               <span className="feature-icon">🛠️</span>
               <h3>Moderatsiya & Reports</h3>
-              <p>Spam va noto'g'ri tarkibga qarshi real-time report va admin moderatsiya tizimi.</p>
+              <p>Spam va noto'g'ri tarkibga qarshi real-time report tizimi.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="cta-section bg-grid-dark text-center">
+      {/* CTA */}
+      <section className="cta-section bg-grid-dark text-center scroll-reveal">
         <div className="container">
           <h2 className="cta-title">O'z davrangizni hoziroq yarating</h2>
           <p className="cta-subtitle">

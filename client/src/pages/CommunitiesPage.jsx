@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import useScrollReveal from '../hooks/useScrollReveal';
 import SearchBar from '../components/SearchBar';
 import CircleCard from '../components/CircleCard';
 import Skeleton from '../components/Skeleton';
@@ -15,9 +16,10 @@ export default function CommunitiesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Hammasi');
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('popular'); // popular, newest
+  const [sort, setSort] = useState('popular');
 
-  // Fetch categories
+  useScrollReveal('.scroll-reveal');
+
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -34,7 +36,6 @@ export default function CommunitiesPage() {
     loadCategories();
   }, []);
 
-  // Fetch circles with Supabase
   useEffect(() => {
     async function fetchCircles() {
       setLoading(true);
@@ -76,9 +77,8 @@ export default function CommunitiesPage() {
   }, [selectedCategory, search, sort, categories]);
 
   return (
-    <div className="communities-page container animate-fade-in">
-      {/* Page Header */}
-      <div className="communities-header flex justify-between items-end mb-8 animate-slide-up">
+    <div className="communities-page container page-enter">
+      <div className="communities-header flex justify-between items-end mb-8">
         <div>
           <span className="badge badge-accent mb-2">🌐 Hamjamiyatlar</span>
           <h1 className="text-4xl font-extrabold">Barcha Davralar</h1>
@@ -92,7 +92,6 @@ export default function CommunitiesPage() {
         )}
       </div>
 
-      {/* Controls: Search & Sort */}
       <div className="communities-controls-bar flex justify-between items-center gap-4 mb-6">
         <div className="search-flex-item">
           <SearchBar
@@ -119,7 +118,6 @@ export default function CommunitiesPage() {
         </div>
       </div>
 
-      {/* Category Pills */}
       <div className="category-pills-scroll mb-8">
         <button
           className={`category-pill ${selectedCategory === 'Hammasi' ? 'active' : ''}`}
@@ -138,17 +136,18 @@ export default function CommunitiesPage() {
         ))}
       </div>
 
-      {/* Expandable Hover Grid */}
       {loading ? (
-        <div className="circles-masonry-grid">
+        <div className="card-grid">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton.Card key={i} />
           ))}
         </div>
       ) : circles.length > 0 ? (
-        <div className="circles-masonry-grid">
-          {circles.map((circle) => (
-            <CircleCard key={circle.id} circle={circle} />
+        <div className="card-grid">
+          {circles.map((circle, index) => (
+            <div key={circle.id} className="stagger-item" style={{ animationDelay: `${(index + 1) * 60}ms` }}>
+              <CircleCard circle={circle} />
+            </div>
           ))}
         </div>
       ) : (

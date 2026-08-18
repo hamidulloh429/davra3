@@ -54,7 +54,6 @@ export default function AdminDashboard() {
           totalMedia: totalMedia || 0,
         });
 
-        // Fetch recent audit logs
         const { data: logs } = await supabase
           .from('audit_logs')
           .select('*, admins(name, google_email)')
@@ -73,7 +72,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard page-enter">
       <div className="dashboard-header mb-6">
         <h1>Boshqaruv paneli</h1>
         <p className="text-muted">Platformadagi umumiy statistika va so'nggi ma'lumotlar overview.</p>
@@ -81,7 +80,7 @@ export default function AdminDashboard() {
 
       {/* 8 Stats Cards Grid */}
       <div className="admin-stats-grid mb-8">
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper blue">👥</div>
           <div>
             <span className="stat-value">{stats.totalUsers}</span>
@@ -89,7 +88,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper green">⚡</div>
           <div>
             <span className="stat-value">{stats.activeUsers}</span>
@@ -97,7 +96,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper red">🚫</div>
           <div>
             <span className="stat-value">{stats.blockedUsers}</span>
@@ -105,7 +104,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper purple">✨</div>
           <div>
             <span className="stat-value">+{stats.newUsers7d}</span>
@@ -113,7 +112,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper orange">🌐</div>
           <div>
             <span className="stat-value">{stats.totalCircles}</span>
@@ -121,7 +120,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper green">🔥</div>
           <div>
             <span className="stat-value">{stats.activeCircles}</span>
@@ -129,7 +128,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper blue">💬</div>
           <div>
             <span className="stat-value">{stats.totalMessages}</span>
@@ -137,7 +136,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="admin-stat-card card">
+        <div className="admin-stat-card card stagger-item">
           <div className="stat-icon-wrapper yellow">🖼️</div>
           <div>
             <span className="stat-value">{stats.totalMedia}</span>
@@ -148,19 +147,19 @@ export default function AdminDashboard() {
 
       {/* Quick Action Grid */}
       <div className="dashboard-actions-row mb-8">
-        <Link to="/admin/users" className="action-card card">
+        <Link to="/admin/users" className="action-card card stagger-item" style={{ animationDelay: '100ms' }}>
           <span className="action-icon">👥</span>
           <h4>Foydalanuvchilarni boshqarish</h4>
           <p>Bloklash, roli o'zgartirish, profil ma'lumotlarini ko'rish</p>
         </Link>
 
-        <Link to="/admin/communities" className="action-card card">
+        <Link to="/admin/communities" className="action-card card stagger-item" style={{ animationDelay: '200ms' }}>
           <span className="action-icon">🌐</span>
           <h4>Davralarni boshqarish</h4>
           <p>Yangi davra ochish, tahrirlash, arxivlash, maxfiylikni o'zgartirish</p>
         </Link>
 
-        <Link to="/admin/settings" className="action-card card">
+        <Link to="/admin/settings" className="action-card card stagger-item" style={{ animationDelay: '300ms' }}>
           <span className="action-icon">⚙️</span>
           <h4>Platforma sozlamalari</h4>
           <p>Sayt nomi, fayl hajmi chegaralari, maintenance rejimi</p>
