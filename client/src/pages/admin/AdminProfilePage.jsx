@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { supabase } from '../../lib/supabase';
+import FormField from '../../components/FormField';
 import PasswordStrength from '../../components/PasswordStrength';
 
 export default function AdminProfilePage() {
@@ -64,14 +65,14 @@ export default function AdminProfilePage() {
   };
 
   return (
-    <div className="admin-profile-page max-w-xl mx-auto">
+    <div className="admin-profile-page max-w-xl mx-auto page-enter">
       <div className="admin-page-header mb-6">
         <h1>Admin Profil Sozlamalari</h1>
         <p className="text-muted">Shaxsiy admin hisobingiz va xavfsizlik paroli</p>
       </div>
 
       {/* Admin Info Card */}
-      <div className="card p-6 mb-6 text-left">
+      <div className="card card-glass p-6 mb-6 text-left">
         <div className="flex items-center gap-4 mb-4">
           <div className="stat-icon-wrapper blue">👤</div>
           <div>
@@ -80,7 +81,7 @@ export default function AdminProfilePage() {
           </div>
         </div>
 
-        <div className="text-sm text-muted flex flex-col gap-2">
+        <div className="text-sm text-secondary flex flex-col gap-2">
           <p><strong>Google Email:</strong> {admin?.google_email}</p>
           <p><strong>Login Username:</strong> {admin?.login || 'O\'rnatilmagan'}</p>
           <p><strong>Oxirgi Parol O'zgargan:</strong> {admin?.password_changed_at ? new Date(admin.password_changed_at).toLocaleString('uz-UZ') : 'Hech qachon'}</p>
@@ -88,46 +89,43 @@ export default function AdminProfilePage() {
       </div>
 
       {/* Change Password Form */}
-      <form onSubmit={handlePasswordChange} className="card p-6 text-left">
+      <form onSubmit={handlePasswordChange} className="card card-glass p-6 text-left">
         <h3 className="mb-4">Admin Parolini O'zgartirish</h3>
 
         {admin?.password_hash && (
-          <div className="input-group mb-4">
-            <label className="input-label">Joriy Parol</label>
+          <FormField label="Joriy Parol" required>
             <input
               type="password"
-              className="input"
+              className="form-input"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
             />
-          </div>
+          </FormField>
         )}
 
-        <div className="input-group mb-4">
-          <label className="input-label">Yangi Parol</label>
+        <FormField label="Yangi Parol" required>
           <input
             type="password"
-            className="input"
+            className="form-input"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
           <PasswordStrength password={newPassword} />
-        </div>
+        </FormField>
 
-        <div className="input-group mb-6">
-          <label className="input-label">Yangi Parolni Tasdiqlang</label>
+        <FormField label="Yangi Parolni Tasdiqlang" required>
           <input
             type="password"
-            className="input"
+            className="form-input"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-        </div>
+        </FormField>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-6">
           <button type="button" className="btn btn-outline btn-danger" onClick={logoutAdmin}>
             Admin Paneldan Chiqish
           </button>

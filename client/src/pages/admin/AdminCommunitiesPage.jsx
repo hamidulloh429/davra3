@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import SearchBar from '../../components/SearchBar';
+import FormField from '../../components/FormField';
 import ConfirmModal from '../../components/ConfirmModal';
 import Modal from '../../components/Modal';
 
@@ -17,7 +18,6 @@ export default function AdminCommunitiesPage() {
 
   // Modals
   const [deleteModalCircle, setDeleteModalCircle] = useState(null);
-  const [editModalCircle, setEditModalCircle] = useState(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -129,7 +129,7 @@ export default function AdminCommunitiesPage() {
   };
 
   return (
-    <div className="admin-communities-page">
+    <div className="admin-communities-page page-enter">
       <div className="admin-page-header flex justify-between items-center mb-6">
         <div>
           <h1>Davralarni boshqarish</h1>
@@ -144,7 +144,7 @@ export default function AdminCommunitiesPage() {
         <SearchBar value={search} onChange={setSearch} placeholder="Davra nomi bo'yicha qidiruv..." />
       </div>
 
-      <div className="card">
+      <div className="card card-glass">
         <div className="table-responsive">
           <table className="admin-table">
             <thead>
@@ -172,7 +172,7 @@ export default function AdminCommunitiesPage() {
                   <tr key={c.id}>
                     <td className="font-semibold">{c.name}</td>
                     <td><span className="badge badge-primary">{c.categories?.name || 'Umumiy'}</span></td>
-                    <td className="text-muted">{c.profiles?.full_name || 'Admin'}</td>
+                    <td className="text-secondary">{c.profiles?.full_name || 'Admin'}</td>
                     <td>
                       <span className={`badge ${c.privacy_type === 'public' ? 'badge-success' : 'badge-warning'}`}>
                         {c.privacy_type === 'public' ? '🌐 Public' : c.privacy_type === 'private' ? '🔒 Private' : '🔗 Invite'}
@@ -207,32 +207,29 @@ export default function AdminCommunitiesPage() {
       {/* Create Modal */}
       {createModalOpen && (
         <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)} title="Yangi davra yaratish">
-          <form onSubmit={handleCreateCircle} className="input-group gap-4">
-            <div className="input-group">
-              <label className="input-label">Davra Nomi</label>
+          <form onSubmit={handleCreateCircle}>
+            <FormField label="Davra Nomi" required>
               <input
                 type="text"
-                className="input"
+                className="form-input"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Tavsifi</label>
+            <FormField label="Tavsifi">
               <textarea
-                className="input"
+                className="form-input"
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
-            </div>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Toifa</label>
+            <FormField label="Toifa">
               <select
-                className="input"
+                className="form-input"
                 value={formData.category_id}
                 onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
               >
@@ -241,12 +238,11 @@ export default function AdminCommunitiesPage() {
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
-            </div>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Maxfiylik turi</label>
+            <FormField label="Maxfiylik turi">
               <select
-                className="input"
+                className="form-input"
                 value={formData.privacy_type}
                 onChange={(e) => setFormData({ ...formData, privacy_type: e.target.value })}
               >
@@ -254,9 +250,9 @@ export default function AdminCommunitiesPage() {
                 <option value="private">🔒 Private (So'rov orqali)</option>
                 <option value="invite_only">🔗 Invite only (Faqat taklifnoma)</option>
               </select>
-            </div>
+            </FormField>
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex justify-end gap-2 mt-6">
               <button type="button" className="btn btn-ghost" onClick={() => setCreateModalOpen(false)}>Bekor qilish</button>
               <button type="submit" className="btn btn-primary">Yaratish</button>
             </div>

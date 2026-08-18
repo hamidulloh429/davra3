@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { validateUsername } from '../lib/utils';
+import FormField from './FormField';
 import './UsernameSetupModal.css';
 
 export default function UsernameSetupModal() {
@@ -74,15 +75,15 @@ export default function UsernameSetupModal() {
       <div className="username-modal-card card-glass animate-scale-in">
         <div className="username-modal-icon">🎉</div>
         <h2>Davra ga xush kelibsiz!</h2>
-        <p>Tizimda davom etish uchun o'zingizga mos noyob username tanlang:</p>
+        <p className="text-secondary mb-4">Tizimda davom etish uchun o'zingizga mos noyob username tanlang:</p>
 
         <form onSubmit={handleSubmit} className="username-form">
-          <div className="input-group">
+          <FormField label="Username tanlang" required>
             <div className="username-input-wrapper">
               <span className="username-prefix">@</span>
               <input
                 type="text"
-                className={`input ${error ? 'input-error' : isAvailable ? 'input-success' : ''}`}
+                className={`form-input ${error ? 'input-error' : isAvailable ? 'input-success' : ''}`}
                 placeholder="username"
                 value={value}
                 onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
@@ -93,9 +94,9 @@ export default function UsernameSetupModal() {
               {isChecking && <span className="username-checking-spinner spinner spinner-sm" />}
             </div>
 
-            {error && <span className="input-error-text">{error}</span>}
-            {isAvailable && <span className="username-available-text">✓ Username bo'sh va tayyor!</span>}
-          </div>
+            {error && <span className="input-error-text mt-1">{error}</span>}
+            {isAvailable && <span className="username-available-text mt-1">✓ Username bo'sh va tayyor!</span>}
+          </FormField>
 
           <button
             type="submit"

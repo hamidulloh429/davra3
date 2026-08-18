@@ -44,13 +44,13 @@ export default function AdminReportsPage() {
   };
 
   return (
-    <div className="admin-reports-page">
+    <div className="admin-reports-page page-enter">
       <div className="admin-page-header mb-6">
         <h1>Shikoyatlar va Moderatsiya (Reports)</h1>
         <p className="text-muted">Foydalanuvchilar tomonidan yuborilgan shikoyatlar ro'yxati</p>
       </div>
 
-      <div className="card">
+      <div className="card card-glass">
         <div className="table-responsive">
           <table className="admin-table">
             <thead>
@@ -75,13 +75,13 @@ export default function AdminReportsPage() {
                     <td className="font-semibold">{r.profiles?.full_name || 'Noma\'lum'}</td>
                     <td><span className="badge badge-primary">{r.target_type}</span></td>
                     <td className="font-medium text-error">{r.reason}</td>
-                    <td className="text-xs text-muted">{r.description || '-'}</td>
+                    <td className="text-xs text-secondary">{r.description || '-'}</td>
                     <td>
                       <span className={`badge ${r.status === 'resolved' ? 'badge-success' : r.status === 'rejected' ? 'badge-muted' : 'badge-warning'}`}>
                         {r.status}
                       </span>
                     </td>
-                    <td className="text-xs text-muted">{new Date(r.created_at).toLocaleDateString('uz-UZ')}</td>
+                    <td className="text-xs text-secondary">{new Date(r.created_at).toLocaleDateString('uz-UZ')}</td>
                     <td>
                       <div className="flex gap-1">
                         <button className="btn btn-sm btn-outline" onClick={() => handleUpdateStatus(r.id, 'resolved')}>

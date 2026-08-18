@@ -3,6 +3,7 @@ import { supabase, getAvatarUrl } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import SearchBar from '../../components/SearchBar';
+import FormField from '../../components/FormField';
 import ConfirmModal from '../../components/ConfirmModal';
 import Modal from '../../components/Modal';
 import './AdminUsersPage.css';
@@ -66,7 +67,6 @@ export default function AdminUsersPage() {
 
       if (error) throw error;
 
-      // Log audit action
       await supabase.from('audit_logs').insert({
         admin_id: admin?.id,
         action: 'user_blocked',
@@ -99,7 +99,6 @@ export default function AdminUsersPage() {
 
       if (error) throw error;
 
-      // Log audit action
       await supabase.from('audit_logs').insert({
         admin_id: admin?.id,
         action: 'user_unblocked',
@@ -141,7 +140,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="admin-users-page">
+    <div className="admin-users-page page-enter">
       <div className="admin-page-header mb-6">
         <div>
           <h1>Foydalanuvchilarni boshqarish</h1>
@@ -180,7 +179,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="card">
+      <div className="card card-glass">
         <div className="table-responsive">
           <table className="admin-table">
             <thead>
@@ -219,8 +218,8 @@ export default function AdminUsersPage() {
                       />
                     </td>
                     <td className="font-semibold">{u.full_name}</td>
-                    <td className="text-primary font-medium">@{u.username || 'yo\'q'}</td>
-                    <td className="text-muted">{u.email}</td>
+                    <td className="text-accent font-medium">@{u.username || 'yo\'q'}</td>
+                    <td className="text-secondary">{u.email}</td>
                     <td>
                       {u.is_blocked ? (
                         <span className="badge badge-error" title={u.block_reason || 'Bloklangan'}>🚫 Bloklangan</span>
@@ -228,7 +227,7 @@ export default function AdminUsersPage() {
                         <span className="badge badge-success">✅ Faol</span>
                       )}
                     </td>
-                    <td className="text-xs text-muted">
+                    <td className="text-xs text-secondary">
                       {new Date(u.created_at).toLocaleDateString('uz-UZ')}
                     </td>
                     <td>
@@ -291,7 +290,7 @@ export default function AdminUsersPage() {
               style={{ margin: '0 auto' }}
             />
             <h3>{selectedUser.full_name}</h3>
-            <p className="text-primary font-semibold mb-4">@{selectedUser.username || 'username_yoq'}</p>
+            <p className="text-accent font-semibold mb-4">@{selectedUser.username || 'username_yoq'}</p>
 
             <div className="text-left bg-surface p-4 rounded-lg mb-4 text-sm">
               <p><strong>Email:</strong> {selectedUser.email}</p>
@@ -316,18 +315,17 @@ export default function AdminUsersPage() {
           onClose={() => setBlockModalUser(null)}
           title={`Foydalanuvchini bloklash: ${blockModalUser.full_name}`}
         >
-          <div className="input-group mb-4 text-left">
-            <label className="input-label">Bloklash sababi</label>
+          <FormField label="Bloklash sababi" required>
             <textarea
-              className="input"
+              className="form-input"
               rows={3}
               placeholder="Masalan: Qoidalarga zid xabarlar yuborgani uchun..."
               value={blockReason}
               onChange={(e) => setBlockReason(e.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mt-4">
             <button className="btn btn-ghost" onClick={() => setBlockModalUser(null)}>
               Bekor qilish
             </button>

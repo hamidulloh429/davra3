@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { getAssetUrl } from '../services/api';
+import { supabase, getAvatarUrl, getStorageUrl } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import EventCard from '../components/EventCard';
 import Skeleton from '../components/Skeleton';
 import CommunityChat from '../components/CommunityChat';
 import './CommunityDetailPage.css';
@@ -11,57 +10,112 @@ import './CommunityDetailPage.css';
 export default function CommunityDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loginWithGoogle } = useAuth();
   const { showToast } = useToast();
-  const [community, setCommunity] = useState(null);
+
+  const [circle, setCircle] = useState(null);
   const [members, setMembers] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [isJoined, setIsJoined] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'about' | 'members'
 
   useEffect(() => {
-    fetchCommunityData();
-  }, [slug]);
+    fetchCircleDetails();
+  }, [slug, user]);
 
-  const fetchCommunityData = async () => {
+  const fetchCircleDetails = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/communities/${slug}`);
-      if (res && res.community) {
-        setCommunity(res.community);
-        setMembers(res.members || []);
-        setEvents(res.events || []);
-      } else {
+
+      // Fetch circle details by slug or id
+      const { data: circleData, error: circleErr } = await supabase
+        .from('circles')
+        .select('*, categories(name), profiles!creator_id(full_name)')
+        .or(`slug.eq.${slug},id.eq.${slug}`)
+        .single();
+
+      if (circleErr || !circleData) {
         showToast('Davra topilmadi', 'error');
         navigate('/communities');
+        return;
+      }
+
+      setCircle(circleData);
+
+      // Fetch members
+      const { data: memberData } = await supabase
+        .from('circle_members')
+        .select('*, profiles(*)')
+        .eq('circle_id', circleData.id);
+
+      if (memberData) {
+        setMembers(memberData);
+        if (user) {
+          const userIsMember = memberData.some(m => m.user_id === user.id);
+          setIsJoined(userIsMember || circleData.creator_id === user.id);
+        }
       }
     } catch (err) {
-      showToast('Davra topilmadi', 'error');
-      navigate('/communities');
+      console.error('Circle detail fetch error:', err);
+      showToast('Davrani yuklashda xatolik', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const isJoined = user && (members.some(m => m.id === user.id) || (community && community.owner_id === user.id));
-
-  const toggleJoin = async () => {
+  const handleToggleJoin = async () => {
     if (!user) {
-      showToast('Davraga qo\'shilish uchun avval tizimga kiring', 'warning');
+      showToast("Davraga qo'shilish uchun avval tizimga kiring", 'warning');
+      loginWithGoogle();
       return;
     }
+
+    if (!circle) return;
+
     setActionLoading(true);
     try {
       if (isJoined) {
-        await api.post(`/communities/${community.id}/leave`);
+        // Leave circle
+        const { error } = await supabase
+          .from('circle_members')
+          .delete()
+          .eq('circle_id', circle.id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        // Decrement member count
+        await supabase
+          .from('circles')
+          .update({ member_count: Math.max(1, (circle.member_count || 1) - 1) })
+          .eq('id', circle.id);
+
+        setIsJoined(false);
         showToast('Davradan chiqdingiz', 'info');
       } else {
-        await api.post(`/communities/${community.id}/join`);
-        showToast("Davraga muvaffaqiyatli qo'shildingiz", 'success');
-        setActiveTab('chat'); // Auto-switch to chat upon joining
+        // Join circle
+        const { error } = await supabase
+          .from('circle_members')
+          .insert({
+            circle_id: circle.id,
+            user_id: user.id,
+            role: 'member'
+          });
+
+        if (error) throw error;
+
+        // Increment member count
+        await supabase
+          .from('circles')
+          .update({ member_count: (circle.member_count || 0) + 1 })
+          .eq('id', circle.id);
+
+        setIsJoined(true);
+        setActiveTab('chat');
+        showToast("Davraga muvaffaqiyatli qo'shildingiz!", 'success');
       }
-      fetchCommunityData();
+      fetchCircleDetails();
     } catch (err) {
       showToast(err.message || 'Xatolik yuz berdi', 'error');
     } finally {
@@ -71,137 +125,117 @@ export default function CommunityDetailPage() {
 
   if (loading) {
     return (
-      <div className="container" style={{ marginTop: '2rem' }}>
+      <div className="page-container page-enter" style={{ marginTop: '2rem' }}>
         <Skeleton.Card />
       </div>
     );
   }
-  
-  if (!community) return null;
+
+  if (!circle) return null;
+
+  const coverUrl = circle.cover_image
+    ? getStorageUrl('circle-covers', circle.cover_image)
+    : null;
 
   return (
-    <div className="community-detail">
-      <div className="detail-cover">
-        <div 
-          className="cover-bg" 
-          style={{ 
-            backgroundImage: community.cover_image ? `url(${community.cover_image})` : 'none',
-            backgroundColor: 'var(--color-indigo, #1f3a5f)'
-          }}
-        ></div>
-        <div className="container cover-content">
-          <span className="badge">{community.category}</span>
-          <h1>{community.name}</h1>
-          <p>{community.member_count || members.length} nafar faol a'zo</p>
-          <button 
-            className={`btn ${isJoined ? 'btn-ghost' : 'btn-primary'} mt-4`}
-            onClick={toggleJoin}
+    <div className="community-detail-page page-enter">
+      {/* Cover Header */}
+      <div
+        className="detail-cover-banner"
+        style={{
+          background: coverUrl
+            ? `linear-gradient(to bottom, rgba(18, 60, 207, 0.4), #123ccf), url(${coverUrl}) center/cover no-repeat`
+            : 'linear-gradient(135deg, #1a4ae0 0%, #123ccf 100%)'
+        }}
+      >
+        <div className="page-container cover-content">
+          <span className="badge badge-accent mb-2">{circle.categories?.name || 'Hamjamiyat'}</span>
+          <h1>{circle.name}</h1>
+          <p className="text-secondary">{circle.member_count || members.length} nafar faol a'zo</p>
+          <button
+            className={`btn ${isJoined ? 'btn-outline' : 'btn-primary'} mt-4 btn-lg`}
+            onClick={handleToggleJoin}
             disabled={actionLoading}
-            style={{ backgroundColor: isJoined ? '#ffffff' : '', color: isJoined ? '#0f1f33' : '' }}
           >
             {actionLoading ? 'Kuting...' : isJoined ? 'Davradan chiqish' : "Davraga qo'shilish"}
           </button>
         </div>
       </div>
 
-      {/* Navigation tabs */}
-      <div className="community-tabs-nav container">
-        <button 
-          className={`comm-tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
-          onClick={() => setActiveTab('chat')}
-        >
-          💬 Networking Chati
-          {isJoined && <span className="tab-dot"></span>}
-        </button>
-        <button 
-          className={`comm-tab-btn ${activeTab === 'about' ? 'active' : ''}`}
-          onClick={() => setActiveTab('about')}
-        >
-          ℹ️ Davra haqida & Tadbirlar ({events.length})
-        </button>
-        <button 
-          className={`comm-tab-btn ${activeTab === 'members' ? 'active' : ''}`}
-          onClick={() => setActiveTab('members')}
-        >
-          👥 A'zolar ({members.length})
-        </button>
+      {/* Nav Tabs */}
+      <div className="community-tabs-bar">
+        <div className="page-container flex gap-3">
+          <button
+            className={`comm-tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
+            onClick={() => setActiveTab('chat')}
+          >
+            💬 Networking Chati
+          </button>
+          <button
+            className={`comm-tab-btn ${activeTab === 'about' ? 'active' : ''}`}
+            onClick={() => setActiveTab('about')}
+          >
+            ℹ️ Davra haqida
+          </button>
+          <button
+            className={`comm-tab-btn ${activeTab === 'members' ? 'active' : ''}`}
+            onClick={() => setActiveTab('members')}
+          >
+            👥 A'zolar ({members.length})
+          </button>
+        </div>
       </div>
 
-      <div className="container detail-content">
+      {/* Main Content Area */}
+      <div className="page-container detail-main-content">
         {activeTab === 'chat' && (
-          <div className="chat-layout-full animate-fade-in">
-            <CommunityChat 
-              community={community} 
-              isJoined={isJoined} 
-              onJoinRequest={toggleJoin} 
+          <div className="chat-tab-wrapper animate-fade-in">
+            <CommunityChat
+              community={circle}
+              isJoined={isJoined}
+              onJoinRequest={handleToggleJoin}
             />
           </div>
         )}
 
         {activeTab === 'about' && (
-          <div className="about-layout animate-fade-in">
-            <div className="main-col">
-              <section className="about-section card">
-                <h2>Davra haqida</h2>
-                <p>{community.description || 'Ushbu davra haqida ma\'lumot kiritilmagan.'}</p>
-              </section>
+          <div className="about-tab-wrapper card card-glass animate-fade-in">
+            <h2>Davra Haqida</h2>
+            <p className="mt-2 text-secondary">{circle.description || 'Ushbu davra haqida ma\'lumot kiritilmagan.'}</p>
 
-              <section className="events-section">
-                <h2>Yaqinlashayotgan Tadbirlar ({events.length})</h2>
-                {events.length > 0 ? (
-                  events.map(event => <EventCard key={event.id} event={event} onJoinSuccess={fetchCommunityData} />)
-                ) : (
-                  <div className="card" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
-                    <p>Hozircha rejalashtirilgan tadbirlar yo'q.</p>
-                  </div>
-                )}
-              </section>
-            </div>
-            
-            <div className="side-col">
-              <section className="members-section card">
-                <h3>A'zolar ({members.length})</h3>
-                <div className="members-grid">
-                  {members.length > 0 ? (
-                    members.map((m, i) => (
-                      <div key={m.id || i} className="member-avatar" title={m.full_name}>
-                        <img 
-                          src={getAssetUrl(m.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.full_name || 'User')}&background=d89b3d&color=fff`} 
-                          alt={m.full_name || 'A\'zo'} 
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted">Hozircha a'zolar yo'q.</p>
-                  )}
-                </div>
-              </section>
+            <div className="circle-meta-list mt-6 pt-6 border-t">
+              <div className="meta-item">
+                <span className="font-semibold text-accent">Yaratuvchi:</span>{' '}
+                <span>{circle.profiles?.full_name || 'Admin'}</span>
+              </div>
+              <div className="meta-item">
+                <span className="font-semibold text-accent">Maxfiylik:</span>{' '}
+                <span>{circle.privacy_type === 'public' ? '🌐 Ochiq' : '🔒 Yopiq'}</span>
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'members' && (
-          <div className="members-full-layout card animate-fade-in">
-            <h2>Davra a'zolari ({members.length})</h2>
-            <div className="members-cards-grid">
-              {members.map((m) => (
-                <div key={m.id} className="member-card">
-                  <div className="member-card-avatar">
-                    <img 
-                      src={getAssetUrl(m.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.full_name || 'User')}&size=80&background=1F3A5F&color=fff`} 
-                      alt={m.full_name} 
+          <div className="members-tab-wrapper animate-fade-in">
+            <h2 className="mb-4">Davra a'zolari ({members.length})</h2>
+            <div className="card-grid">
+              {members.map((m) => {
+                const profile = m.profiles || m;
+                return (
+                  <div key={m.id || profile.id} className="member-card card flex items-center gap-4">
+                    <img
+                      src={getAvatarUrl(profile.avatar_url, profile.full_name)}
+                      alt={profile.full_name || 'Member'}
+                      className="avatar avatar-lg"
                     />
+                    <div>
+                      <h4>{profile.full_name || 'A\'zo'}</h4>
+                      <span className="text-xs text-accent font-semibold">@{profile.username || 'username'}</span>
+                    </div>
                   </div>
-                  <div className="member-card-info">
-                    <h4>{m.full_name}</h4>
-                    {m.role && (
-                      <span className="badge" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>
-                        {m.role === 'owner' ? 'Egasi' : m.role === 'moderator' ? 'Moderator' : "A'zo"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

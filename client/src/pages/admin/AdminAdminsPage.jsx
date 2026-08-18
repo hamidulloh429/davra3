@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import FormField from '../../components/FormField';
 import ConfirmModal from '../../components/ConfirmModal';
 import Modal from '../../components/Modal';
 
@@ -112,7 +113,7 @@ export default function AdminAdminsPage() {
   };
 
   return (
-    <div className="admin-admins-page">
+    <div className="admin-admins-page page-enter">
       <div className="admin-page-header flex justify-between items-center mb-6">
         <div>
           <h1>Administratorlar boshqaruvi</h1>
@@ -125,7 +126,7 @@ export default function AdminAdminsPage() {
         )}
       </div>
 
-      <div className="card">
+      <div className="card card-glass">
         <div className="table-responsive">
           <table className="admin-table">
             <thead>
@@ -151,7 +152,7 @@ export default function AdminAdminsPage() {
                 adminsList.map((a) => (
                   <tr key={a.id}>
                     <td className="font-semibold">{a.google_email}</td>
-                    <td className="text-primary font-mono">{a.login || 'Hali o\'rnatilmagan'}</td>
+                    <td className="text-accent font-mono">{a.login || 'Hali o\'rnatilmagan'}</td>
                     <td>
                       <span className={`badge ${a.role === 'super_admin' ? 'badge-accent' : 'badge-primary'}`}>
                         {a.role === 'super_admin' ? '👑 SUPER ADMIN' : a.role === 'admin' ? '⚙️ ADMIN' : '🛡️ MODERATOR'}
@@ -162,7 +163,7 @@ export default function AdminAdminsPage() {
                         {a.status === 'active' ? 'Faol' : 'Nofaol'}
                       </span>
                     </td>
-                    <td className="text-xs text-muted">
+                    <td className="text-xs text-secondary">
                       {new Date(a.created_at).toLocaleDateString('uz-UZ')}
                     </td>
                     <td>
@@ -187,24 +188,22 @@ export default function AdminAdminsPage() {
       {/* Add Admin Modal */}
       {createModalOpen && (
         <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)} title="Yangi Admin Biriktirish">
-          <form onSubmit={handleAddAdmin} className="input-group gap-4 text-left">
-            <div className="input-group">
-              <label className="input-label">Admin Google Emaili</label>
+          <form onSubmit={handleAddAdmin} className="text-left">
+            <FormField label="Admin Google Emaili" required>
               <input
                 type="email"
-                className="input"
+                className="form-input"
                 placeholder="masalan: admin@gmail.com"
                 value={formData.google_email}
                 onChange={(e) => setFormData({ ...formData, google_email: e.target.value })}
                 required
               />
-              <span className="input-hint">Faqat ushbu Google account bilan admin panelga kirish ruxsat beriladi.</span>
-            </div>
+              <span className="text-xs text-secondary mt-1">Faqat ushbu Google account bilan admin panelga kirish ruxsat beriladi.</span>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Roli va Huquqlari</label>
+            <FormField label="Roli va Huquqlari" required>
               <select
-                className="input"
+                className="form-input"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
@@ -212,9 +211,9 @@ export default function AdminAdminsPage() {
                 <option value="moderator">MODERATOR (Faqat chat va kontent)</option>
                 <option value="super_admin">SUPER ADMIN (To'liq huquq)</option>
               </select>
-            </div>
+            </FormField>
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex justify-end gap-2 mt-6">
               <button type="button" className="btn btn-ghost" onClick={() => setCreateModalOpen(false)}>Bekor qilish</button>
               <button type="submit" className="btn btn-primary">Admin Biriktirish</button>
             </div>
