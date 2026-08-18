@@ -1,82 +1,160 @@
 import { useState, useEffect } from 'react';
-import api from '../services/api';
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import SearchBar from '../components/SearchBar';
-import CommunityCard from '../components/CommunityCard';
+import CircleCard from '../components/CircleCard';
 import Skeleton from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
 import './CommunitiesPage.css';
 
-const CATEGORIES = ['Hammasi', 'Texnologiya', "San'at", 'Sport', "Ta'lim", 'Biznes', "Sog'liq", 'Sayohat', 'Musiqa', 'Boshqa'];
-
 export default function CommunitiesPage() {
-  const [communities, setCommunities] = useState([]);
+  const { user } = useAuth();
+  const [circles, setCircles] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState('Hammasi');
+  const [selectedCategory, setSelectedCategory] = useState('Hammasi');
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('popular');
+  const [sort, setSort] = useState('popular'); // popular, newest
 
+  // Fetch categories
   useEffect(() => {
-    const fetchCommunities = async () => {
+    async function loadCategories() {
+      try {
+        const { data } = await supabase
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (data) setCategories(data);
+      } catch (err) {
+        console.error('Categories fetch error:', err);
+      }
+    }
+    loadCategories();
+  }, []);
+
+  // Fetch circles with Supabase
+  useEffect(() => {
+    async function fetchCircles() {
       setLoading(true);
       try {
-        let url = '/communities?';
-        if (category !== 'Hammasi') url += `category=${encodeURIComponent(category)}&`;
-        if (search) url += `search=${encodeURIComponent(search)}&`;
-        url += `sort=${sort}`;
-        
-        const data = await api.get(url);
-        setCommunities(Array.isArray(data) ? data : data.communities || []);
+        let query = supabase
+          .from('circles')
+          .select('*, categories(name), profiles!creator_id(full_name)')
+          .eq('is_hidden', false)
+          .eq('is_archived', false);
+
+        if (selectedCategory !== 'Hammasi') {
+          const matchedCat = categories.find(c => c.name === selectedCategory);
+          if (matchedCat) {
+            query = query.eq('category_id', matchedCat.id);
+          }
+        }
+
+        if (search.trim()) {
+          query = query.ilike('name', `%${search.trim()}%`);
+        }
+
+        if (sort === 'popular') {
+          query = query.order('member_count', { ascending: false });
+        } else {
+          query = query.order('created_at', { ascending: false });
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        setCircles(data || []);
       } catch (err) {
-        setCommunities([]);
+        console.error('Circles fetch error:', err);
+        setCircles([]);
       } finally {
         setLoading(false);
       }
-    };
-    fetchCommunities();
-  }, [category, search, sort]);
+    }
+    fetchCircles();
+  }, [selectedCategory, search, sort, categories]);
 
   return (
-    <div className="container communities-page">
-      <div className="page-header">
-        <h1>Davralar</h1>
-        <p>O'zingizga yoqqan hamjamiyatni toping va unga qo'shiling.</p>
+    <div className="communities-page container animate-fade-in">
+      {/* Page Header */}
+      <div className="communities-header flex justify-between items-end mb-8 animate-slide-up">
+        <div>
+          <span className="badge badge-accent mb-2">🌐 Hamjamiyatlar</span>
+          <h1 className="text-4xl font-extrabold">Barcha Davralar</h1>
+          <p className="text-muted mt-1">Qiziqishingizga mos davrani toping yoki o'z davrangizni oching.</p>
+        </div>
+
+        {user && (
+          <Link to="/communities/new" className="btn btn-primary btn-lg">
+            + Yangi Davra Yaratish
+          </Link>
+        )}
       </div>
 
-      <div className="filters-section">
-        <div className="search-wrapper">
-          <SearchBar onSearch={setSearch} />
+      {/* Controls: Search & Sort */}
+      <div className="communities-controls-bar flex justify-between items-center gap-4 mb-6">
+        <div className="search-flex-item">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Davralarni qidirish..."
+          />
         </div>
-        <div className="filter-controls">
-          <select 
-            className="form-control category-select" 
-            value={category} 
-            onChange={e => setCategory(e.target.value)}
+
+        <div className="sort-controls flex items-center gap-2">
+          <span className="text-xs text-muted font-semibold">Saralash:</span>
+          <button
+            className={`btn btn-sm ${sort === 'popular' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setSort('popular')}
           >
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <select 
-            className="form-control sort-select"
-            value={sort}
-            onChange={e => setSort(e.target.value)}
+            🔥 Mashhur
+          </button>
+          <button
+            className={`btn btn-sm ${sort === 'newest' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setSort('newest')}
           >
-            <option value="popular">Mashhur</option>
-            <option value="newest">Eng yangi</option>
-          </select>
+            ✨ Eng yangi
+          </button>
         </div>
       </div>
 
+      {/* Category Pills */}
+      <div className="category-pills-scroll mb-8">
+        <button
+          className={`category-pill ${selectedCategory === 'Hammasi' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('Hammasi')}
+        >
+          Hammasi
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            className={`category-pill ${selectedCategory === cat.name ? 'active' : ''}`}
+            onClick={() => setSelectedCategory(cat.name)}
+          >
+            {cat.icon || '🏷️'} {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Expandable Hover Grid */}
       {loading ? (
-        <div className="communities-grid">
-          {Array.from({ length: 8 }).map((_, i) => <Skeleton.Card key={i} />)}
+        <div className="circles-masonry-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton.Card key={i} />
+          ))}
         </div>
-      ) : communities.length > 0 ? (
-        <div className="communities-grid">
-          {communities.map(c => <CommunityCard key={c.id || c._id} community={c} />)}
+      ) : circles.length > 0 ? (
+        <div className="circles-masonry-grid">
+          {circles.map((circle) => (
+            <CircleCard key={circle.id} circle={circle} />
+          ))}
         </div>
       ) : (
-        <EmptyState 
-          title="Hozircha davralar mavjud emas" 
-          description="Siz qidirayotgan mezonlarga mos davra topilmadi." 
+        <EmptyState
+          title="Davralar topilmadi"
+          description="Siz qidirayotgan mezonlarga mos hamjamiyat mavjud emas."
         />
       )}
     </div>

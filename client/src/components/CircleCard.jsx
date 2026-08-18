@@ -22,13 +22,12 @@ export default function CircleCard({ circle }) {
     ? getStorageUrl('circle-covers', cover_image)
     : null;
 
-  // Fallback background color based on name
   const fallbackBg = ['#123CCF', '#06258F', '#10B981', '#7C3AED', '#DB2777'][
     (name.charCodeAt(0) || 0) % 5
   ];
 
   return (
-    <Link to={`/communities/${slug || circle.id}`} className="circle-card card card-interactive">
+    <Link to={`/communities/${slug || circle.id}`} className="circle-card card card-expandable">
       <div
         className="circle-cover"
         style={{
@@ -50,10 +49,10 @@ export default function CircleCard({ circle }) {
         <p className="circle-desc">{description || 'Davra tavsifi kiritilmagan.'}</p>
 
         <div className="circle-footer">
-          <div className="circle-members text-muted text-xs">
+          <div className="circle-members">
             <span>👥 {member_count} nafar a'zo</span>
           </div>
-          <span className="btn btn-sm btn-ghost text-primary">Qo'shilish →</span>
+          <span className="btn btn-sm btn-outline btn-join-circle">Qo'shilish →</span>
         </div>
       </div>
     </Link>
