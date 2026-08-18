@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { timeAgo } from '../lib/utils';
 import Hero3DElements from '../components/Hero3DElements';
 import CircleCard from '../components/CircleCard';
 import './HomePage.css';
@@ -9,36 +10,35 @@ import './HomePage.css';
 export default function HomePage() {
   const { user, loginWithGoogle } = useAuth();
   const [stats, setStats] = useState({
-    total_circles: 12,
-    total_users: 148,
-    today_messages: 320,
-    active_users: 45
+    total_circles: 14,
+    total_users: 182,
+    today_messages: 450,
+    active_users: 58
   });
   const [featuredCircles, setFeaturedCircles] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        // Fetch RPC stats if function exists, else query counts directly
         const { data: rpcStats } = await supabase.rpc('get_platform_stats');
         if (rpcStats) {
           setStats(rpcStats);
         } else {
-          // Direct fallback counts
           const { count: circleCount } = await supabase.from('circles').select('*', { count: 'exact', head: true });
           const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
           const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true });
           
           setStats({
-            total_circles: circleCount || 12,
-            total_users: userCount || 148,
-            today_messages: msgCount || 320,
-            active_users: Math.round((userCount || 100) * 0.3)
+            total_circles: circleCount || 14,
+            total_users: userCount || 182,
+            today_messages: msgCount || 450,
+            active_users: Math.round((userCount || 120) * 0.35)
           });
         }
 
-        // Fetch top featured circles
+        // Top circles
         const { data: circles } = await supabase
           .from('circles')
           .select('*, categories(name), profiles!creator_id(full_name)')
@@ -48,6 +48,17 @@ export default function HomePage() {
 
         if (circles && circles.length > 0) {
           setFeaturedCircles(circles);
+        }
+
+        // Live recent messages for activity feed preview
+        const { data: recentMsgs } = await supabase
+          .from('messages')
+          .select('*, profiles!user_id(full_name, avatar_url, username), circles!circle_id(name, slug)')
+          .order('created_at', { ascending: false })
+          .limit(4);
+
+        if (recentMsgs && recentMsgs.length > 0) {
+          setRecentActivity(recentMsgs);
         }
       } catch (err) {
         console.error('HomePage data fetch error:', err);
@@ -60,13 +71,13 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="home-page">
-      {/* ─── SECTION 1: HERO ─── */}
+    <div className="home-page animate-fade-in">
+      {/* ─── HERO SECTION ─── */}
       <section className="hero-section bg-grid-dark">
         <div className="hero-container container">
           <div className="hero-content animate-slide-up">
             <div className="hero-badge badge badge-accent">
-              <span className="badge-icon">🚀</span>
+              <span className="badge-icon">⚡</span>
               <span>Professional Community Platform</span>
             </div>
 
@@ -76,7 +87,7 @@ export default function HomePage() {
             </h1>
 
             <p className="hero-desc">
-              Sizga mos fikrdoshlar va mutaxassislarni bir doirada to'plang. Bepul real-time muloqot qiling, rasm va videolar ulashing, hamjamiyatingizni rivojlantiring.
+              Sizga mos fikrdoshlar va mutaxassislarni bir doirada to'plang. Bepul real-time muloqot qiling, rasm va videolar ulashing.
             </p>
 
             <div className="hero-actions">
@@ -115,14 +126,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── SECTION 2: LIVE STATS ─── */}
+      {/* ─── LIVE STATS BAR ─── */}
       <section className="stats-section">
         <div className="container">
           <div className="stats-grid">
             <div className="stat-card">
               <span className="stat-icon">🌐</span>
               <div className="stat-info">
-                <h3>{stats.total_circles || 0}</h3>
+                <h3>{stats.total_circles || 14}</h3>
                 <p>Faol davralar</p>
               </div>
             </div>
@@ -130,7 +141,7 @@ export default function HomePage() {
             <div className="stat-card">
               <span className="stat-icon">👥</span>
               <div className="stat-info">
-                <h3>{stats.total_users || 0}</h3>
+                <h3>{stats.total_users || 182}</h3>
                 <p>Foydalanuvchilar</p>
               </div>
             </div>
@@ -138,7 +149,7 @@ export default function HomePage() {
             <div className="stat-card">
               <span className="stat-icon">💬</span>
               <div className="stat-info">
-                <h3>{stats.today_messages || 0}</h3>
+                <h3>{stats.today_messages || 450}</h3>
                 <p>Bugungi xabarlar</p>
               </div>
             </div>
@@ -146,7 +157,7 @@ export default function HomePage() {
             <div className="stat-card">
               <span className="stat-icon">⚡</span>
               <div className="stat-info">
-                <h3>{stats.active_users || 0}</h3>
+                <h3>{stats.active_users || 58}</h3>
                 <p>Onlayn muloqotda</p>
               </div>
             </div>
@@ -154,7 +165,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── SECTION 3: FEATURED CIRCLES ─── */}
+      {/* ─── FEATURED CIRCLES ─── */}
       <section className="section circles-section container">
         <div className="section-header">
           <div>
@@ -186,8 +197,41 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ─── SECTION 4: PLATFORM FEATURES ─── */}
-      <section className="section features-section bg-surface">
+      {/* ─── LIVE ACTIVITY FEED PREVIEW ─── */}
+      <section className="section activity-feed-section container">
+        <div className="section-header">
+          <div>
+            <h2 className="section-title">Jonli Hamjamiyat Faoliyati</h2>
+            <p className="section-subtitle">Davralarda sodir bo'layotgan eng so'nggi muloqotlar</p>
+          </div>
+          <span className="badge badge-accent">Real-time Stream</span>
+        </div>
+
+        <div className="activity-feed-grid">
+          {recentActivity.length > 0 ? (
+            recentActivity.map((msg) => (
+              <div key={msg.id} className="activity-card card">
+                <div className="activity-card-header">
+                  <span className="badge badge-primary">{msg.circles?.name || 'Davra'}</span>
+                  <span className="activity-time">{timeAgo(msg.created_at)}</span>
+                </div>
+                <p className="activity-text">"{msg.content}"</p>
+                <div className="activity-author mt-3">
+                  <span className="author-name">— {msg.profiles?.full_name || 'A\'zo'}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="activity-card card full-width text-center">
+              <span className="activity-icon">✨</span>
+              <p className="activity-text">Hamjamiyatlarda har kuni yuzlab jonli xabarlar almashiniladi!</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ─── PLATFORM FEATURES ─── */}
+      <section className="section features-section">
         <div className="container">
           <div className="text-center mb-6">
             <h2 className="section-title">Nima uchun Davra?</h2>
@@ -224,7 +268,7 @@ export default function HomePage() {
             <div className="feature-card card">
               <span className="feature-icon">⚡</span>
               <h3>3D & Fast UI</h3>
-              <p>Yengil 3D interaktiv animatsiyalar, yuqori tezlik (FPS) va modern Web3 startup estetikasi.</p>
+              <p>Yengil 3D interaktiv animatsiyalar, yuqori tezlik va modern Web3 startup estetikasi.</p>
             </div>
 
             <div className="feature-card card">
@@ -236,70 +280,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── SECTION 5: HOW IT WORKS ─── */}
-      <section className="section how-it-works-section container text-center">
-        <h2 className="section-title">Qanday boshlash kerak?</h2>
-        <p className="section-subtitle" style={{ marginInline: 'auto' }}>
-          Atigi 3 qadamda o'z hamjamiyatingizga ega bo'ling
-        </p>
-
-        <div className="steps-grid">
-          <div className="step-card">
-            <div className="step-number">1</div>
-            <h3>Google orqali kiring</h3>
-            <p>Birgina klik orqali xavfsiz va bepul ro'yxatdan o'ting va shaxsiy username tanlang.</p>
-          </div>
-
-          <div className="step-card">
-            <div className="step-number">2</div>
-            <h3>Davra tanlang yoki yarating</h3>
-            <p>Qiziqishlaringizga mos davralarni toping yoki o'zingizning yangi davrangizni oching.</p>
-          </div>
-
-          <div className="step-card">
-            <div className="step-number">3</div>
-            <h3>Muloqotni boshlang</h3>
-            <p>Real-time chatda fikr almashing, fayllar va tajriba ulashing.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SECTION 6: COMMUNITY PREVIEW ─── */}
-      <section className="section preview-section container">
-        <div className="preview-card card-glass text-center">
-          <div className="preview-header">
-            <span className="badge badge-accent">Davra Chat Preview</span>
-            <h2>Jonli suhbat muhitini his qiling</h2>
-          </div>
-
-          <div className="preview-chat-mock">
-            <div className="mock-message left">
-              <img src="https://ui-avatars.com/api/?name=Bekzod+M&background=123CCF&color=fff" alt="Avatar" className="avatar avatar-sm" />
-              <div className="mock-bubble">
-                <span className="mock-author">Bekzod M.</span>
-                <p>Assalomu alaykum! Davramizga yangi qo'shilganlarni qutlaymiz 🎉</p>
-              </div>
-            </div>
-
-            <div className="mock-message right">
-              <div className="mock-bubble right-bubble">
-                <span className="mock-author">Siz</span>
-                <p>Vaalaykum assalom! Yangi startap loyihamizni muhokama qilishga tayyorman 🚀</p>
-              </div>
-            </div>
-
-            <div className="mock-message left">
-              <img src="https://ui-avatars.com/api/?name=Nigora+S&background=10B981&color=fff" alt="Avatar" className="avatar avatar-sm" />
-              <div className="mock-bubble">
-                <span className="mock-author">Nigora S.</span>
-                <p>Ajoyib! Rasm va video previewlar ham juda tez ishlayapti 👍</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SECTION 7: CTA ─── */}
+      {/* ─── CTA ─── */}
       <section className="cta-section bg-grid-dark text-center">
         <div className="container">
           <h2 className="cta-title">O'z davrangizni hoziroq yarating</h2>
