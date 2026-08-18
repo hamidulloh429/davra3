@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import FormField from '../../components/FormField';
 import PasswordStrength from '../../components/PasswordStrength';
 import './AdminLoginPage.css';
 
@@ -15,7 +16,6 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState('');
 
-  // Step 1: Trigger Google OAuth login for Admin
   const handleGoogleSignIn = async () => {
     setLocalError('');
     try {
@@ -31,7 +31,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  // Check auth state after callback if user just signed in via Google
   const handleVerifyCurrentSession = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
@@ -46,7 +45,6 @@ export default function AdminLoginPage() {
     setLoading(false);
   };
 
-  // Handle first time credential setup
   const handleSetupSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
@@ -66,7 +64,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  // Handle 2-Factor Login Submission
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
@@ -78,7 +75,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="admin-login-page bg-grid-dark">
+    <div className="admin-login-page bg-grid-dark page-enter">
       <div className="admin-login-card card-glass animate-scale-in">
         <div className="admin-brand">
           <span className="brand-logo">DAVRA</span>
@@ -123,8 +120,7 @@ export default function AdminLoginPage() {
               Bu admin hisobingiz uchun birinchi kirish. Xavfsiz login va parol o'rnating.
             </p>
 
-            <div className="input-group mb-4">
-              <label className="input-label">Admin Login</label>
+            <FormField label="Admin Login" required>
               <input
                 type="text"
                 className="input"
@@ -133,10 +129,9 @@ export default function AdminLoginPage() {
                 placeholder="masalan: admin_jasur"
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="input-group mb-4">
-              <label className="input-label">Yangi Parol</label>
+            <FormField label="Yangi Parol" required>
               <input
                 type="password"
                 className="input"
@@ -146,10 +141,9 @@ export default function AdminLoginPage() {
                 required
               />
               <PasswordStrength password={passwordInput} />
-            </div>
+            </FormField>
 
-            <div className="input-group mb-6">
-              <label className="input-label">Parolni tasdiqlang</label>
+            <FormField label="Parolni tasdiqlang" required>
               <input
                 type="password"
                 className="input"
@@ -158,9 +152,9 @@ export default function AdminLoginPage() {
                 placeholder="••••••••"
                 required
               />
-            </div>
+            </FormField>
 
-            <button type="submit" className="btn btn-primary btn-lg w-full">
+            <button type="submit" className="btn btn-primary btn-lg w-full mt-4">
               Credentials Saqlash & Kirish
             </button>
           </form>
@@ -174,8 +168,7 @@ export default function AdminLoginPage() {
               Google tasdiqlandi. Admin login va parolingizni kiriting.
             </p>
 
-            <div className="input-group mb-4">
-              <label className="input-label">Admin Login</label>
+            <FormField label="Admin Login" required>
               <input
                 type="text"
                 className="input"
@@ -185,10 +178,9 @@ export default function AdminLoginPage() {
                 required
                 autoFocus
               />
-            </div>
+            </FormField>
 
-            <div className="input-group mb-6">
-              <label className="input-label">Parol</label>
+            <FormField label="Parol" required>
               <input
                 type="password"
                 className="input"
@@ -197,9 +189,9 @@ export default function AdminLoginPage() {
                 placeholder="••••••••"
                 required
               />
-            </div>
+            </FormField>
 
-            <button type="submit" className="btn btn-primary btn-lg w-full">
+            <button type="submit" className="btn btn-primary btn-lg w-full mt-4">
               Dashboardga Kirish
             </button>
           </form>

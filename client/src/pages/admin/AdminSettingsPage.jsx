@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase, getStorageUrl } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import FormField from '../../components/FormField';
 
 export default function AdminSettingsPage() {
   const { admin } = useAdminAuth();
@@ -27,6 +28,7 @@ export default function AdminSettingsPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     async function loadSiteSettings() {
@@ -46,6 +48,47 @@ export default function AdminSettingsPage() {
     }
     loadSiteSettings();
   }, []);
+
+  // Handle Logo Upload to site-assets bucket
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Logo hajmi 5MB dan oshmasligi kerak", "error");
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      const ext = file.name.split('.').pop();
+      const filePath = `site_logo_${Date.now()}.${ext}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from('site-assets')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadErr) {
+        // Fallback to chat-media bucket if site-assets not auto created
+        const { error: fallbackErr } = await supabase.storage
+          .from('chat-media')
+          .upload(`logo/${filePath}`, file, { upsert: true });
+
+        if (fallbackErr) throw fallbackErr;
+        const publicUrl = getStorageUrl('chat-media', `logo/${filePath}`);
+        setSettings(prev => ({ ...prev, logo_url: publicUrl }));
+      } else {
+        const publicUrl = getStorageUrl('site-assets', filePath);
+        setSettings(prev => ({ ...prev, logo_url: publicUrl }));
+      }
+
+      showToast("Sayt logosi muvaffaqiyatli yuklandi!", "success");
+    } catch (err) {
+      showToast(err.message || "Logo yuklashda xatolik", "error");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -68,7 +111,7 @@ export default function AdminSettingsPage() {
         target_id: '1',
       });
 
-      showToast('Sayt sozlamalari saqlandi!', 'success');
+      showToast('Sayt sozlamalari va Logo saqlandi!', 'success');
     } catch (err) {
       showToast(err.message || 'Saqlashda xatolik', 'error');
     } finally {
@@ -77,22 +120,47 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="admin-settings-page">
+    <div className="admin-settings-page page-enter">
       <div className="admin-page-header mb-6">
-        <h1>Platforma sozlamalari</h1>
-        <p className="text-muted">Butun platforma uchun umumiy konfiguratsiya va chegaralar</p>
+        <span className="badge badge-accent mb-2">⚙️ Sozlamalar</span>
+        <h1>Platforma Sozlamalari & Logo</h1>
+        <p className="text-muted">Butun platforma uchun logo, brending va chegaralar</p>
       </div>
 
-      <form onSubmit={handleSave} className="card p-8 text-left">
+      <form onSubmit={handleSave} className="card p-8 text-left card-glass">
         <div className="form-grid">
-          {/* General */}
+          {/* Logo Management Section */}
           <div className="full-width">
+            <h3>Sayt Logosi (Brand Logo)</h3>
+            <hr className="divider" />
+            <div className="logo-management-box flex items-center gap-6 my-4 p-4 card">
+              <div className="logo-preview-container">
+                {settings.logo_url ? (
+                  <img src={settings.logo_url} alt="Site Logo" style={{ height: '54px', objectFit: 'contain' }} />
+                ) : (
+                  <div className="text-2xl font-black text-accent">DAVRA</div>
+                )}
+              </div>
+
+              <div className="flex-1">
+                <label className="btn btn-outline btn-sm cursor-pointer">
+                  <span>{uploadingLogo ? 'Yuklanmoqda...' : '📷 Yangi Logo Fayl Yuklash'}</span>
+                  <input type="file" accept="image/*" onChange={handleLogoUpload} hidden disabled={uploadingLogo} />
+                </label>
+                <p className="text-xs text-muted mt-2">
+                  Formatlar: PNG, SVG, WEBP. Maksimal hajm: 5MB. Logotip header va footer'da namoyon bo'ladi.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* General Details */}
+          <div className="full-width mt-4">
             <h3>Umumiy ma'lumotlar</h3>
             <hr className="divider" />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Sayt Nomi</label>
+          <FormField label="Sayt Nomi" required>
             <input
               type="text"
               className="input"
@@ -100,10 +168,9 @@ export default function AdminSettingsPage() {
               onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
               required
             />
-          </div>
+          </FormField>
 
-          <div className="input-group">
-            <label className="input-label">Hero Sarlavhasi</label>
+          <FormField label="Hero Sarlavhasi" required>
             <input
               type="text"
               className="input"
@@ -111,91 +178,84 @@ export default function AdminSettingsPage() {
               onChange={(e) => setSettings({ ...settings, hero_title: e.target.value })}
               required
             />
-          </div>
+          </FormField>
 
-          <div className="input-group full-width">
-            <label className="input-label">Tavsif (Description)</label>
-            <textarea
-              className="input"
-              rows={2}
-              value={settings.description}
-              onChange={(e) => setSettings({ ...settings, description: e.target.value })}
-            />
+          <div className="full-width">
+            <FormField label="Tavsif (Description)">
+              <textarea
+                className="input"
+                rows={2}
+                value={settings.description}
+                onChange={(e) => setSettings({ ...settings, description: e.target.value })}
+              />
+            </FormField>
           </div>
 
           {/* Contact */}
-          <div className="full-width mt-6">
+          <div className="full-width mt-4">
             <h3>Aloqa va Ijtimoiy tarmoqlar</h3>
             <hr className="divider" />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Aloqa Emaili</label>
+          <FormField label="Aloqa Emaili">
             <input
               type="email"
               className="input"
               value={settings.contact_email}
               onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
             />
-          </div>
+          </FormField>
 
-          <div className="input-group">
-            <label className="input-label">Telegram Kanal URL</label>
+          <FormField label="Telegram Kanal URL">
             <input
               type="url"
               className="input"
               value={settings.telegram_url}
               onChange={(e) => setSettings({ ...settings, telegram_url: e.target.value })}
             />
-          </div>
+          </FormField>
 
-          <div className="input-group">
-            <label className="input-label">Instagram URL</label>
+          <FormField label="Instagram URL">
             <input
               type="url"
               className="input"
               value={settings.instagram_url}
               onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
             />
-          </div>
+          </FormField>
 
-          {/* System & Modes */}
-          <div className="full-width mt-6">
+          {/* Limits & Modes */}
+          <div className="full-width mt-4">
             <h3>Tizim Rejimlari & Chegaralar</h3>
             <hr className="divider" />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Max Rasm Hajmi (Baytda)</label>
+          <FormField label="Max Rasm Hajmi (Baytda)" hint={`Hozirgi: ${Math.round(settings.max_image_size / (1024 * 1024))} MB`}>
             <input
               type="number"
               className="input"
               value={settings.max_image_size}
               onChange={(e) => setSettings({ ...settings, max_image_size: parseInt(e.target.value) })}
             />
-            <span className="input-hint">Hozirgi: {Math.round(settings.max_image_size / (1024 * 1024))} MB</span>
-          </div>
+          </FormField>
 
-          <div className="input-group">
-            <label className="input-label">Max Video Hajmi (Baytda)</label>
+          <FormField label="Max Video Hajmi (Baytda)" hint={`Hozirgi: ${Math.round(settings.max_video_size / (1024 * 1024))} MB`}>
             <input
               type="number"
               className="input"
               value={settings.max_video_size}
               onChange={(e) => setSettings({ ...settings, max_video_size: parseInt(e.target.value) })}
             />
-            <span className="input-hint">Hozirgi: {Math.round(settings.max_video_size / (1024 * 1024))} MB</span>
-          </div>
+          </FormField>
 
-          <div className="input-group">
-            <label className="input-label">Max Xabar Uzunligi (Belgilar)</label>
+          <FormField label="Max Xabar Uzunligi (Belgilar)">
             <input
               type="number"
               className="input"
               value={settings.max_message_length}
               onChange={(e) => setSettings({ ...settings, max_message_length: parseInt(e.target.value) })}
             />
-          </div>
+          </FormField>
 
           <div className="full-width flex gap-6 mt-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -204,7 +264,7 @@ export default function AdminSettingsPage() {
                 checked={settings.registration_enabled}
                 onChange={(e) => setSettings({ ...settings, registration_enabled: e.target.checked })}
               />
-              <span className="font-semibold">Ro'yxatdan o'tish ochiq</span>
+              <span className="font-semibold text-accent">Ro'yxatdan o'tish ochiq</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer text-error">

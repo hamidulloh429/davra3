@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { supabase, getAvatarUrl } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { getAvatarUrl } from '../lib/supabase';
 import NotificationBell from './NotificationBell';
 import './Navbar.css';
 
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [siteLogo, setSiteLogo] = useState(null);
 
   useEffect(() => {
     function handleScroll() {
@@ -23,13 +24,33 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    async function fetchSiteLogo() {
+      try {
+        const { data } = await supabase.from('site_settings').select('logo_url').eq('id', 1).single();
+        if (data?.logo_url) {
+          setSiteLogo(data.logo_url);
+        }
+      } catch (err) {
+        console.error('Fetch site logo error:', err);
+      }
+    }
+    fetchSiteLogo();
+  }, []);
+
   return (
     <header className={`navbar-header ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container container">
         {/* Brand Logo */}
         <Link to="/" className="navbar-logo">
-          <span className="logo-text">DAVRA</span>
-          <span className="logo-dot" />
+          {siteLogo ? (
+            <img src={siteLogo} alt="Davra Logo" className="navbar-logo-img" style={{ maxHeight: '36px', objectFit: 'contain' }} />
+          ) : (
+            <>
+              <span className="logo-text">DAVRA</span>
+              <span className="logo-dot" />
+            </>
+          )}
         </Link>
 
         {/* Center Nav Links (Desktop) */}

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, timeAgo } from '../lib/utils';
 import useScrollReveal from '../hooks/useScrollReveal';
+import FormField from '../components/FormField';
 import CircleCard from '../components/CircleCard';
 import './ProfilePage.css';
 
@@ -236,11 +237,10 @@ export default function ProfilePage() {
       {/* Edit Form */}
       {isEditing ? (
         <form onSubmit={handleSave} className="profile-edit-form card animate-scale-in mt-8">
-          <h3>Profil ma'lumotlarini tahrirlash</h3>
+          <h3 className="mb-4">Profil ma'lumotlarini tahrirlash</h3>
 
           <div className="form-grid">
-            <div className="input-group">
-              <label className="input-label">To'liq ism</label>
+            <FormField label="To'liq ism" required>
               <input
                 type="text"
                 className="input"
@@ -248,10 +248,9 @@ export default function ProfilePage() {
                 onChange={e => setFormData({ ...formData, full_name: e.target.value })}
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Username</label>
+            <FormField label="Username" required>
               <input
                 type="text"
                 className="input"
@@ -259,21 +258,21 @@ export default function ProfilePage() {
                 onChange={e => setFormData({ ...formData, username: e.target.value })}
                 required
               />
+            </FormField>
+
+            <div className="full-width">
+              <FormField label="Bio (O'zingiz haqingizda)">
+                <textarea
+                  className="input"
+                  rows={3}
+                  value={formData.bio}
+                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                  placeholder="Qisqacha o'zingiz haqingizda yozing..."
+                />
+              </FormField>
             </div>
 
-            <div className="input-group full-width">
-              <label className="input-label">Bio (O'zingiz haqingizda)</label>
-              <textarea
-                className="input"
-                rows={3}
-                value={formData.bio}
-                onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Qisqacha o'zingiz haqingizda yozing..."
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Joylashuv</label>
+            <FormField label="Joylashuv">
               <input
                 type="text"
                 className="input"
@@ -281,10 +280,9 @@ export default function ProfilePage() {
                 onChange={e => setFormData({ ...formData, location: e.target.value })}
                 placeholder="Toshkent, O'zbekiston"
               />
-            </div>
+            </FormField>
 
-            <div className="input-group">
-              <label className="input-label">Veb-sayt URL</label>
+            <FormField label="Veb-sayt URL">
               <input
                 type="url"
                 className="input"
@@ -292,30 +290,31 @@ export default function ProfilePage() {
                 onChange={e => setFormData({ ...formData, website: e.target.value })}
                 placeholder="https://example.com"
               />
-            </div>
+            </FormField>
 
-            <div className="input-group full-width">
-              <label className="input-label">Qiziqishlar (Enter bosing)</label>
-              <input
-                type="text"
-                className="input"
-                value={interestInput}
-                onChange={e => setInterestInput(e.target.value)}
-                onKeyDown={handleAddInterest}
-                placeholder="Masalan: Startaplar, AI, Dizayn..."
-              />
-              <div className="interests-tags mt-2">
-                {formData.interests.map((tag, idx) => (
-                  <span key={idx} className="badge badge-primary">
-                    {tag}
-                    <button type="button" onClick={() => handleRemoveInterest(tag)} className="tag-remove">&times;</button>
-                  </span>
-                ))}
-              </div>
+            <div className="full-width">
+              <FormField label="Qiziqishlar (Enter bosing)">
+                <input
+                  type="text"
+                  className="input"
+                  value={interestInput}
+                  onChange={e => setInterestInput(e.target.value)}
+                  onKeyDown={handleAddInterest}
+                  placeholder="Masalan: Startaplar, AI, Dizayn..."
+                />
+                <div className="interests-tags mt-2">
+                  {formData.interests.map((tag, idx) => (
+                    <span key={idx} className="badge badge-primary">
+                      {tag}
+                      <button type="button" onClick={() => handleRemoveInterest(tag)} className="tag-remove">&times;</button>
+                    </span>
+                  ))}
+                </div>
+              </FormField>
             </div>
           </div>
 
-          <div className="form-actions mt-6">
+          <div className="form-actions mt-6 flex justify-end gap-3">
             <button type="button" className="btn btn-ghost" onClick={() => setIsEditing(false)}>Bekor qilish</button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Saqlanmoqda...' : 'Saqlash'}

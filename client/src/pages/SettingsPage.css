@@ -1,72 +1,82 @@
+/* ============================================
+   DAVRA v2.0 — Settings Page Styles
+   ============================================ */
+
 .settings-page {
-  padding-top: var(--space-8);
-  padding-bottom: var(--space-16);
-  max-width: var(--container-lg);
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-xl);
+  max-width: var(--container-max);
 }
 
 .settings-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
-  gap: var(--space-8);
+  gap: var(--space-lg);
 }
 
 .settings-tabs {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-xs);
 }
 
 .tab-btn {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-sm);
   text-align: left;
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   border-radius: var(--radius-lg);
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all var(--transition-fast);
 }
 
 .tab-btn:hover {
-  background: var(--surface);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .tab-btn.active {
-  background: var(--primary);
-  color: var(--text-inverse);
+  background: var(--color-accent);
+  color: #0A0A0A;
+  font-weight: var(--weight-bold);
+  box-shadow: var(--glow-accent);
 }
 
 .tab-btn.danger.active {
   background: var(--error);
+  color: #ffffff;
 }
 
 .settings-content {
-  padding: var(--space-8);
+  padding: var(--space-lg);
 }
 
 .toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: var(--space-4);
-  border-bottom: 1px solid var(--border-light);
+  padding-block: var(--space-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .toggle-title {
   font-size: var(--text-base);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-bold);
+  color: #ffffff;
   display: block;
 }
 
 .toggle-desc {
   font-size: var(--text-xs);
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .toggle-row input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--primary);
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-accent);
   cursor: pointer;
 }
 
@@ -77,5 +87,9 @@
   .settings-tabs {
     flex-direction: row;
     overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .tab-btn {
+    white-space: nowrap;
   }
 }

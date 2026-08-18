@@ -1,0 +1,41 @@
+/* ============================================
+   DAVRA v2.0 — FormField Component Styles
+   ============================================ */
+
+.form-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: var(--space-md);
+}
+
+.form-field-label {
+  display: block;
+  width: 100%;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent);
+  margin-bottom: 8px;
+  text-align: left;
+  line-height: 1.3;
+}
+
+.form-field-control {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-hint {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
+}
+
+.form-field-error {
+  font-size: var(--text-xs);
+  color: #F87171;
+  margin-top: 4px;
+  font-weight: var(--weight-semibold);
+}

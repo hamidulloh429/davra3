@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { slugify } from '../lib/utils';
+import FormField from '../components/FormField';
 import './CreateCommunityPage.css';
 
 export default function CreateCommunityPage() {
@@ -69,7 +70,6 @@ export default function CreateCommunityPage() {
 
       if (error) throw error;
 
-      // Add creator as owner member in circle_members
       await supabase.from('circle_members').insert({
         circle_id: newCircle.id,
         user_id: user.id,
@@ -96,34 +96,31 @@ export default function CreateCommunityPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="create-form">
-          <div className="form-group">
-            <label className="form-label">Davra nomi *</label>
+        <form onSubmit={handleSubmit} className="create-form mt-6">
+          <FormField label="Davra nomi" required>
             <input 
               type="text" 
-              className="input form-control" 
+              className="input" 
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
               placeholder="Masalan: Samarqand Startaplari"
               required
             />
-          </div>
+          </FormField>
 
-          <div className="form-group">
-            <label className="form-label">Tavsif</label>
+          <FormField label="Tavsif">
             <textarea 
-              className="input form-control" 
+              className="input" 
               rows="4"
               value={formData.description}
               onChange={e => setFormData({...formData, description: e.target.value})}
               placeholder="Davra maqsadi, kimlar uchun ekanligi haqida qisqacha ma'lumot..."
             ></textarea>
-          </div>
+          </FormField>
 
-          <div className="form-group">
-            <label className="form-label">Kategoriya</label>
+          <FormField label="Kategoriya">
             <select 
-              className="input form-control"
+              className="input"
               value={formData.category_id}
               onChange={e => setFormData({...formData, category_id: e.target.value})}
             >
@@ -131,23 +128,21 @@ export default function CreateCommunityPage() {
                 <option key={c.id} value={c.id}>{c.icon || '🏷️'} {c.name}</option>
               ))}
             </select>
-          </div>
+          </FormField>
 
-          <div className="form-group">
-            <label className="form-label">Muqova rasm URL (ixtiyoriy)</label>
+          <FormField label="Muqova rasm URL (ixtiyoriy)">
             <input 
               type="url" 
-              className="input form-control" 
+              className="input" 
               value={formData.cover_image}
               onChange={e => setFormData({...formData, cover_image: e.target.value})}
               placeholder="https://images.unsplash.com/photo-..."
             />
-          </div>
+          </FormField>
 
-          <div className="form-group">
-            <label className="form-label">Ko'rinishi (Maxfiylik)</label>
+          <FormField label="Ko'rinishi (Maxfiylik)">
             <select 
-              className="input form-control"
+              className="input"
               value={formData.privacy_type}
               onChange={e => setFormData({...formData, privacy_type: e.target.value})}
             >
@@ -155,7 +150,7 @@ export default function CreateCommunityPage() {
               <option value="private">🔒 Yopiq (faqat a'zolar ko'radi)</option>
               <option value="invite_only">🔗 Faqat taklif bilan</option>
             </select>
-          </div>
+          </FormField>
 
           <div className="form-actions mt-6">
             <button type="submit" className="btn btn-primary btn-xl w-full" disabled={loading}>
